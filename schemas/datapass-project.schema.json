@@ -1,0 +1,1458 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/julian-passebecq/datapass-vscode/schemas/datapass-project.schema.json",
+  "title": "DataPass Project Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "project"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "enum": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "description": "1: V2.1 format. 2: scopes, apps, packs, graph, remote-only repositories. 3 (DataPass V3): environments, project docs, planned repositories and a default repository per scope; pairs with graph version 0.2. 4: adds localEnv (env files and required variable names) and identifiers (explicitly non-secret ids). 5: adds toolchain (tools, version ranges, where they run), identifier kind and values per environment (the ID map), and connections (sign-ins, Git bindings, cloud connections)."
+    },
+    "project": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "profile": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "type": {
+          "enum": [
+            "dev",
+            "work",
+            "perso"
+          ],
+          "description": "Project type (DataPass 0.20): dev and perso turn work orders on once the machine setting datapass.ai.workOrders.enabled is on, and the agent merges its PRs when CI is green; work (FOIL, clients) keeps work orders off unless modules.workOrders is true, and the person merges. The machine setting datapass.ai.projectTypes wins. Unset: dev."
+        }
+      }
+    },
+    "modules": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Modules this project uses. false switches a module off (hidden in Galaxy, Work and Links); unlisted modules stay on. Use \"DataPass: Choose Project Modules…\".",
+      "properties": {
+        "fabric": {
+          "type": "boolean"
+        },
+        "databricks": {
+          "type": "boolean"
+        },
+        "powerbi": {
+          "type": "boolean"
+        },
+        "grafana": {
+          "type": "boolean"
+        },
+        "infrastructure": {
+          "type": "boolean"
+        },
+        "airflow": {
+          "type": "boolean"
+        },
+        "mongoku": {
+          "type": "boolean",
+          "deprecated": true,
+          "description": "Legacy switch from older manifests: accepted and ignored."
+        },
+        "diagramcloud": {
+          "type": "boolean"
+        },
+        "workOrders": {
+          "type": "boolean",
+          "description": "Work orders for AI agents (DataPass 0.20). false switches them off for this project; a work project (project.type work) needs true to turn them on. A project can never switch them on alone: the machine setting datapass.ai.workOrders.enabled is required."
+        },
+        "pilot": {
+          "type": "boolean",
+          "description": "Pilot mode (later, read-only first). false switches it off for this project. Not built yet."
+        },
+        "azure": {
+          "type": "boolean",
+          "description": "Azure data services: Data Factory, Functions, Storage, Cosmos DB."
+        },
+        "databases": {
+          "type": "boolean",
+          "description": "Databases as project destinations: MongoDB Atlas, PostgreSQL / Neon."
+        }
+      }
+    },
+    "repositories": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "label": {
+            "type": "string"
+          },
+          "remote": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "url"
+            ],
+            "properties": {
+              "url": {
+                "type": "string",
+                "pattern": "^(https://[^\\s@/]+/[^\\s]+|https://([A-Za-z0-9][A-Za-z0-9._-]*)@dev\\.azure\\.com/\\2/[^\\s]+|git@[A-Za-z0-9.-]+:[A-Za-z0-9._%/-]+|([A-Za-z0-9][A-Za-z0-9._-]*)@vs-ssh\\.visualstudio\\.com:v3/\\3/[A-Za-z0-9._%/-]+)$",
+                "description": "https or git@host:path; never embed credentials. Azure DevOps: the address its Clone button copies (https://<organization>@dev.azure.com/<organization>/<project>/_git/<repo>) and its SSH address (git@ssh.dev.azure.com:v3/<organization>/<project>/<repo>) are accepted and name the same repository."
+              },
+              "branch": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9._/-]{1,200}$"
+              }
+            }
+          },
+          "management": {
+            "enum": [
+              "local",
+              "remote-only"
+            ]
+          },
+          "planned": {
+            "const": true,
+            "description": "v3: this repository does not exist yet (to be created). Operations that need its files stay blocked."
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 500,
+            "description": "v3: what lives in this repository (shown to people and in AI context)."
+          }
+        },
+        "anyOf": [
+          {
+            "required": [
+              "path"
+            ]
+          },
+          {
+            "required": [
+              "remote"
+            ]
+          },
+          {
+            "required": [
+              "planned"
+            ]
+          }
+        ],
+        "not": {
+          "required": [
+            "planned",
+            "path"
+          ]
+        }
+      }
+    },
+    "platforms": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "fabric": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "workspaceName": {
+              "type": "string"
+            },
+            "workspaceId": {
+              "type": "string"
+            },
+            "toolboxRoot": {
+              "type": "string"
+            },
+            "deployment": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "configPath": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "Workspace-relative Fabric deployment config path. Defaults to .deploy/fabric.yml."
+                },
+                "repositoryDirectory": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "Workspace-relative directory containing Fabric item definitions. Defaults to workspace root."
+                },
+                "targetEnvironment": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "Optional environment name passed to fab deploy --target_env."
+                }
+              }
+            }
+          }
+        },
+        "databricks": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "bundleRoot": {
+              "type": "string"
+            },
+            "defaultTarget": {
+              "type": "string"
+            }
+          }
+        },
+        "grafana": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "generatorCommand": {
+              "type": "string"
+            },
+            "watchPath": {
+              "type": "string"
+            },
+            "url": {
+              "type": "string",
+              "pattern": "^(https://[^\\s/?#@]+(/[^\\s?#\\\\]*)?|http://(localhost|127\\.0\\.0\\.1|\\[::1\\])(:[0-9]{1,5})?(/[^\\s?#\\\\]*)?)$",
+              "description": "Grafana stack base URL, e.g. https://<stack>.grafana.net/. https (or http://localhost); no credentials, query or #fragment. Navigation only: DataPass never checks sign-in or data freshness."
+            },
+            "dashboards": {
+              "type": "array",
+              "maxItems": 50,
+              "description": "Dashboards to open from the Work view. Requires url.",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "uid",
+                  "title"
+                ],
+                "properties": {
+                  "uid": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z0-9_-]{1,40}$",
+                    "description": "Grafana dashboard UID (opened as <url>/d/<uid>)."
+                  },
+                  "title": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "scopes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Scope ids (or \"project\") this dashboard belongs to; omit for every scope."
+                  },
+                  "source": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "Workspace-relative dashboard-as-code file (Foundation SDK, JSON, …)."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "infrastructure": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "root": {
+              "type": "string"
+            }
+          }
+        },
+        "oracle": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "sshHost": {
+              "type": "string",
+              "pattern": "^$|^[A-Za-z0-9][A-Za-z0-9._-]{0,99}$",
+              "description": "SSH config host alias only (no user@, port or key). Do not store credentials here."
+            }
+          }
+        },
+        "airflow": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "mode": {
+              "enum": [
+                "local-docker",
+                "oci-k3s",
+                "fabric-git-sync",
+                "fabric-workspace-git",
+                "managed-other"
+              ]
+            },
+            "identity": {
+              "type": "string"
+            },
+            "gitSyncRepo": {
+              "type": "string"
+            },
+            "workspaceGitAlm": {
+              "type": "boolean"
+            }
+          }
+        },
+        "powerbi": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "projectRoot": {
+              "type": "string",
+              "description": "Folder containing the .pbip file(s)."
+            }
+          }
+        }
+      }
+    },
+    "links": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "label",
+          "url"
+        ],
+        "properties": {
+          "label": {
+            "type": "string",
+            "minLength": 1
+          },
+          "url": {
+            "type": "string",
+            "pattern": "^https://"
+          }
+        }
+      }
+    },
+    "companions": {
+      "type": "object",
+      "deprecated": true,
+      "description": "Legacy block from older manifests: accepted and ignored."
+    },
+    "scopes": {
+      "type": "array",
+      "description": "v2: work scopes. One is active per window; a scope focuses navigation and preflight, it does not sandbox tools.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "title"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{0,79}$",
+            "not": {
+              "const": "project"
+            },
+            "description": "\"project\" is reserved for the whole-project scope."
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "objective": {
+            "type": "string"
+          },
+          "itemRefs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_.-]{0,79}$"
+            }
+          },
+          "capabilityRefs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Operation capability ids, e.g. fabric.notebook.local-sync."
+          },
+          "checklist": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "label"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9_.-]{0,79}$"
+                },
+                "label": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "capabilityRef": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "repoRef": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{0,79}$",
+            "description": "v3: default repository of this scope (sub-project); components without their own repoRef use it."
+          },
+          "docs": {
+            "type": "array",
+            "maxItems": 20,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "label"
+              ],
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 120
+                },
+                "path": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 400,
+                  "pattern": "^(?![/\\\\~])(?![A-Za-z]:)(?!.*(^|[/\\\\])\\.\\.([/\\\\]|$)).+$",
+                  "description": "Path relative to the repository root. No absolute paths, no .. segments."
+                },
+                "repoRef": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9_.-]{0,79}$",
+                  "description": "Repository key; omitted = the repository holding this manifest."
+                },
+                "url": {
+                  "type": "string",
+                  "pattern": "^https://[^\\s]+$"
+                }
+              },
+              "oneOf": [
+                {
+                  "required": [
+                    "path"
+                  ],
+                  "not": {
+                    "required": [
+                      "url"
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "url"
+                  ],
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "path"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "repoRef"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "description": "v3: documentation of this scope."
+          }
+        }
+      }
+    },
+    "apps": {
+      "type": "array",
+      "description": "v2: external applications (Streamlit, React…) exchanged with through contracts, not hosted by DataPass.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "appType",
+          "repoRef"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{0,79}$"
+          },
+          "label": {
+            "type": "string"
+          },
+          "appType": {
+            "enum": [
+              "streamlit",
+              "react",
+              "static-site",
+              "api",
+              "other"
+            ]
+          },
+          "repoRef": {
+            "type": "string",
+            "description": "Key in repositories."
+          },
+          "entrypoint": {
+            "type": "string"
+          },
+          "inputContracts": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_.-]{0,79}$"
+            }
+          },
+          "outputContracts": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_.-]{0,79}$"
+            }
+          },
+          "hosting": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "provider"
+            ],
+            "properties": {
+              "provider": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string",
+                "pattern": "^https://"
+              }
+            }
+          },
+          "owner": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "domainPacks": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^(builtin:[a-z][a-z0-9.-]+|[^/\\\\~].*\\.json)$"
+      },
+      "description": "v2: builtin:<name> (e.g. builtin:foil.programme, builtin:sample.retail) or workspace-relative pack files."
+    },
+    "graph": {
+      "type": "string",
+      "description": "v2: workspace-relative path of the project graph (default .datapass/graph.json)."
+    },
+    "resources": {
+      "type": "array",
+      "maxItems": 50,
+      "description": "v2: shared resources, declared once (a VM, container host, cluster). Never credentials.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "kind"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{0,79}$"
+          },
+          "kind": {
+            "enum": [
+              "vm",
+              "container-host",
+              "kubernetes-cluster",
+              "database",
+              "workspace",
+              "other"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "provider": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9 ._-]{1,40}$"
+          },
+          "ssh": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "host"
+            ],
+            "properties": {
+              "host": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,99}$",
+                "description": "Alias from your ~/.ssh/config. No user@, port or key."
+              }
+            }
+          }
+        }
+      }
+    },
+    "bindings": {
+      "type": "array",
+      "maxItems": 200,
+      "description": "v2: how a workload/scope uses a resource. Env lists variable NAMES only.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "resource"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{0,79}$"
+          },
+          "resource": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{0,79}$"
+          },
+          "scopes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "folder": {
+            "type": "string",
+            "pattern": "^/[A-Za-z0-9._/@+-]{0,299}$",
+            "description": "Absolute folder on the host."
+          },
+          "repository": {
+            "type": "string"
+          },
+          "compose": {
+            "type": "string",
+            "minLength": 1
+          },
+          "env": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,63}$"
+            }
+          },
+          "processes": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:@-]{0,59}$"
+            }
+          }
+        }
+      }
+    },
+    "$schema": {
+      "type": "string",
+      "description": "Optional URL of this JSON Schema, for editors and AI tools that validate the file."
+    },
+    "environments": {
+      "type": "array",
+      "maxItems": 20,
+      "description": "v3: deployment environments (dev, test, prod…). Component operations name one; a review confirmed for one environment never applies to another. Names only, never credentials.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{0,79}$"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "production": {
+            "type": "boolean",
+            "description": "true for environments where mistakes affect real users or data."
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 500
+          }
+        }
+      }
+    },
+    "docs": {
+      "type": "array",
+      "maxItems": 50,
+      "description": "v3: project documentation to open from DataPass (architecture notes, AGENTS.md…).",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "label"
+        ],
+        "properties": {
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 400,
+            "pattern": "^(?![/\\\\~])(?![A-Za-z]:)(?!.*(^|[/\\\\])\\.\\.([/\\\\]|$)).+$",
+            "description": "Path relative to the repository root. No absolute paths, no .. segments."
+          },
+          "repoRef": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{0,79}$",
+            "description": "Repository key; omitted = the repository holding this manifest."
+          },
+          "url": {
+            "type": "string",
+            "pattern": "^https://[^\\s]+$"
+          }
+        },
+        "oneOf": [
+          {
+            "required": [
+              "path"
+            ],
+            "not": {
+              "required": [
+                "url"
+              ]
+            }
+          },
+          {
+            "required": [
+              "url"
+            ],
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "path"
+                  ]
+                },
+                {
+                  "required": [
+                    "repoRef"
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "localEnv": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "files"
+      ],
+      "description": "v4: local env files a developer needs and the variable NAMES the project requires. Never values: DataPass only checks which names are present, and tells you to fetch secrets from your local vault (Power Ops).",
+      "properties": {
+        "files": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 10,
+          "description": "Env files, relative to the repository (default: the one holding this manifest). Only .env, .env.<name>, <name>.env and .dev.vars files are accepted.",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200,
+                "pattern": "^(?:.*/)?(?:\\.env(?:\\.[A-Za-z0-9_-]+)*|[A-Za-z0-9_-]+\\.env|\\.dev\\.vars(?:\\.[A-Za-z0-9_-]+)*)$"
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "path"
+                ],
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "maxLength": 200,
+                    "pattern": "^(?:.*/)?(?:\\.env(?:\\.[A-Za-z0-9_-]+)*|[A-Za-z0-9_-]+\\.env|\\.dev\\.vars(?:\\.[A-Za-z0-9_-]+)*)$"
+                  },
+                  "repoRef": {
+                    "type": "string",
+                    "description": "Repository key; omitted = the repository holding this manifest."
+                  },
+                  "optional": {
+                    "type": "boolean",
+                    "description": "true for files such as .env.local that may be absent."
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "requiredKeys": {
+          "type": "array",
+          "maxItems": 100,
+          "uniqueItems": true,
+          "description": "Variable names the project needs, e.g. CLOUDFLARE_ACCOUNT_ID. Names only.",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,127}$"
+          }
+        }
+      }
+    },
+    "identifiers": {
+      "type": "array",
+      "maxItems": 50,
+      "description": "v4: explicitly non-secret identifiers (account, subscription, workspace or project ids) DataPass may show and copy. v5: one value per environment (values) and a kind, which make the project's ID map. Never secrets, tokens, passwords, keys or URLs: those stay in your local vault (Power Ops).",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "label"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{0,79}$"
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "value": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+            "description": "The non-secret id itself (use values instead for one id per environment)."
+          },
+          "provider": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{0,79}$",
+            "description": "e.g. cloudflare, azure, databricks."
+          },
+          "envKey": {
+            "type": "string",
+            "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,127}$",
+            "description": "The env variable this id fills, when there is one."
+          },
+          "values": {
+            "type": "object",
+            "minProperties": 1,
+            "maxProperties": 20,
+            "description": "v5: one non-secret id per declared environment, e.g. { \"dev\": \"…\", \"prod\": \"…\" }. Each key must be an environment id.",
+            "propertyNames": {
+              "pattern": "^[a-z][a-z0-9_.-]{0,79}$"
+            },
+            "additionalProperties": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+            }
+          },
+          "kind": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{0,79}$",
+            "description": "v5: what the id is: tenant, subscription, resource-group, workspace, capacity, lakehouse, warehouse, item, account, project… An Azure CLI or Fabric CLI sign-in compares its tenant (and az its subscription) with identifiers of kind tenant and subscription."
+          }
+        },
+        "oneOf": [
+          {
+            "required": [
+              "value"
+            ]
+          },
+          {
+            "required": [
+              "values"
+            ]
+          }
+        ]
+      }
+    },
+    "toolchain": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tools"
+      ],
+      "description": "v5: the tools the project needs, by DataPass tool id (see docs/PREPARING_A_PROJECT.md), with an optional version range and where each runs. DataPass compares them with what it finds on this computer and shows install commands to copy; it never installs anything.",
+      "properties": {
+        "tools": {
+          "type": "array",
+          "maxItems": 60,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "tool"
+            ],
+            "properties": {
+              "tool": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9]{0,15}\\.[a-z0-9][a-z0-9.-]{0,63}$",
+                "description": "Tool id: cli.az, cli.databricks, cli.fab, ext.fabric, ext.databricks, py.fabric-cicd, pack.powerbi-gbrueckl…"
+              },
+              "version": {
+                "type": "string",
+                "maxLength": 80,
+                "pattern": "^[0-9xX*.,<>=!^~|\\s]+$",
+                "description": "Accepted versions: >=1.0, ^2.3, ~1.4, 1.x, >=1.0 <2.0, >=0.1.20,<1, ^1.4 || ^2.0."
+              },
+              "optional": {
+                "type": "boolean",
+                "description": "Missing is a note, never a warning."
+              },
+              "where": {
+                "enum": [
+                  "local",
+                  "ci",
+                  "fabric"
+                ],
+                "description": "local (default): this computer. ci: the CI pipeline. fabric: Fabric notebooks. Only local tools are checked here."
+              }
+            }
+          }
+        }
+      }
+    },
+    "connections": {
+      "type": "array",
+      "maxItems": 30,
+      "description": "v5: what must be signed in or bound. sign-in: a CLI (cli.az, cli.databricks, cli.fab are checked read-only on request). git-binding and cloud-connection: declared, not checked; DataPass shows the portal page where they are verified. Names only, never credentials.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "kind"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{0,79}$"
+          },
+          "kind": {
+            "enum": [
+              "sign-in",
+              "git-binding",
+              "cloud-connection"
+            ]
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "tool": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9]{0,15}\\.[a-z0-9][a-z0-9.-]{0,63}$",
+            "description": "sign-in: the tool signed in (cli.az, cli.databricks, cli.fab…)."
+          },
+          "identifier": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{0,79}$",
+            "description": "An identifiers[].id: the tenant for an az / fab sign-in, the workspace for a git-binding."
+          },
+          "subscription": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{0,79}$",
+            "description": "az sign-in: the identifiers[].id of the subscription az account show should be set to."
+          },
+          "profile": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+            "description": "databricks sign-in: the Databricks CLI profile name (never a path)."
+          },
+          "environment": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{0,79}$",
+            "description": "The environment this connection is for (an environments[].id)."
+          },
+          "provider": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{0,79}$",
+            "description": "git-binding / cloud-connection: fabric, databricks, azure, powerbi…"
+          },
+          "repoRef": {
+            "type": "string",
+            "description": "git-binding: the repository key."
+          },
+          "folder": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "git-binding: the folder in the repository (omit for its root)."
+          },
+          "branch": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9._/-]{1,200}$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "description": "cloud-connection: its display name in the service, never a connection string."
+          },
+          "portal": {
+            "type": "string",
+            "pattern": "^https://\\S+$",
+            "description": "A page where the person verifies it."
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "sign-in"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "tool"
+              ],
+              "not": {
+                "anyOf": [
+                  {
+                    "required": [
+                      "provider"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "repoRef"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "folder"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "branch"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "name"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "git-binding"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "provider"
+              ],
+              "not": {
+                "anyOf": [
+                  {
+                    "required": [
+                      "tool"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "profile"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "subscription"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "name"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "cloud-connection"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "provider",
+                "name"
+              ],
+              "not": {
+                "anyOf": [
+                  {
+                    "required": [
+                      "tool"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "profile"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "subscription"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "repoRef"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "folder"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "branch"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "description": "DataPass project manifest. schemaVersion 1 is the V2.1 format; 2 adds work scopes, apps, domain packs, the project graph path and remote-only repositories; 3 (DataPass V3) adds environments, project docs, planned repositories and a default repository per scope; 4 adds localEnv and identifiers; 5 adds toolchain, identifiers with one value per environment (the ID map) and connections. Never put secrets in this file.",
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "schemaVersion": {
+            "const": 1
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "repositories": {
+            "additionalProperties": {
+              "required": [
+                "path"
+              ],
+              "not": {
+                "anyOf": [
+                  {
+                    "required": [
+                      "remote"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "management"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "planned"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "description"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "not": {
+          "anyOf": [
+            {
+              "required": [
+                "scopes"
+              ]
+            },
+            {
+              "required": [
+                "apps"
+              ]
+            },
+            {
+              "required": [
+                "domainPacks"
+              ]
+            },
+            {
+              "required": [
+                "graph"
+              ]
+            },
+            {
+              "required": [
+                "environments"
+              ]
+            },
+            {
+              "required": [
+                "docs"
+              ]
+            },
+            {
+              "required": [
+                "resources"
+              ]
+            },
+            {
+              "required": [
+                "bindings"
+              ]
+            },
+            {
+              "required": [
+                "localEnv"
+              ]
+            },
+            {
+              "required": [
+                "identifiers"
+              ]
+            },
+            {
+              "required": [
+                "toolchain"
+              ]
+            },
+            {
+              "required": [
+                "connections"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "schemaVersion": {
+            "const": 2
+          }
+        }
+      },
+      "then": {
+        "not": {
+          "anyOf": [
+            {
+              "required": [
+                "environments"
+              ]
+            },
+            {
+              "required": [
+                "docs"
+              ]
+            },
+            {
+              "required": [
+                "localEnv"
+              ]
+            },
+            {
+              "required": [
+                "identifiers"
+              ]
+            },
+            {
+              "required": [
+                "toolchain"
+              ]
+            },
+            {
+              "required": [
+                "connections"
+              ]
+            }
+          ]
+        },
+        "properties": {
+          "repositories": {
+            "additionalProperties": {
+              "not": {
+                "anyOf": [
+                  {
+                    "required": [
+                      "planned"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "description"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "scopes": {
+            "items": {
+              "not": {
+                "anyOf": [
+                  {
+                    "required": [
+                      "repoRef"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "docs"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "schemaVersion": {
+            "const": 3
+          }
+        }
+      },
+      "then": {
+        "not": {
+          "anyOf": [
+            {
+              "required": [
+                "localEnv"
+              ]
+            },
+            {
+              "required": [
+                "identifiers"
+              ]
+            },
+            {
+              "required": [
+                "toolchain"
+              ]
+            },
+            {
+              "required": [
+                "connections"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "schemaVersion": {
+            "const": 4
+          }
+        }
+      },
+      "then": {
+        "not": {
+          "anyOf": [
+            {
+              "required": [
+                "toolchain"
+              ]
+            },
+            {
+              "required": [
+                "connections"
+              ]
+            }
+          ]
+        },
+        "properties": {
+          "identifiers": {
+            "items": {
+              "not": {
+                "anyOf": [
+                  {
+                    "required": [
+                      "values"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "kind"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

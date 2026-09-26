@@ -6,25 +6,27 @@ DataPass VS Code shows a company's cloud project as one architecture. The client
 its own repositories, which never contain DataPass files, and describes the project in a separate
 **bridge repository** (`.datapass/*.json`). DataPass reads that bridge; removing it breaks nothing.
 
+**Start here:** [How to prepare a client for DataPass](HOW_TO_PREPARE_A_CLIENT.md) (roles, the cycle, the hand-off).
+
 ## Current version
 
-- **Released:** 0.25.0 (2026-09-26).
-- **Next:** 0.26.0 (MCP servers in the toolkit, cost lines with `shared` and `learning-only`,
-  read-only pilot), then 1.0.0.
-- A file that uses a newer field states it; DataPass ≥ that version is needed to read it.
+The delivered version is in [`VERSION`](VERSION), stamped by each sync. A file that uses a newer
+field states it; DataPass ≥ that version is needed to read it.
 
-## Where the formats are (authoritative until this repository is synced)
+## Where the formats are
 
-These links point at the source repository. A release-synced copy will be added here under
-`formats/`, `schemas/` and `examples/`, with a version stamp.
-
-| What | Link |
+| What | Where |
 |---|---|
-| How to prepare a client project (the contract) | https://github.com/julian-passebecq/datapass-vscode/blob/main/docs/PREPARING_A_PROJECT.md |
-| Step-by-step guide (what the AI prepares, known limits, variants, toolkit) | https://github.com/julian-passebecq/datapass-vscode/tree/main/docs/guide |
+| JSON Schemas (manifest, graph, options, sheet, board, toolkit, work orders, tests) | [`schemas/`](schemas/) (release-synced) |
+| Examples (bridge + native folders; `doc-pipeline` has variants A/B/C) | [`examples/`](examples/) (release-synced) |
+| Tools, CLIs and MCP servers, dated | [`knowledge/`](knowledge/README.md) (release-synced) |
+| Field reference (the contract) | https://github.com/julian-passebecq/datapass-vscode/blob/main/docs/PREPARING_A_PROJECT.md |
+| Step-by-step guide | https://github.com/julian-passebecq/datapass-vscode/tree/main/docs/guide |
 | Ready-to-paste prompt for a client's AI | https://github.com/julian-passebecq/datapass-vscode/blob/main/docs/guide/06_PROMPT_FOR_THE_CLIENT_AI.md |
-| JSON Schemas (manifest, graph, options, sheet, board, toolkit, work orders) | https://github.com/julian-passebecq/datapass-vscode/tree/main/schemas |
-| A complete public example (bridge + two native folders, variants A/B/C) | https://github.com/julian-passebecq/datapass-vscode/tree/main/examples/v3/doc-pipeline |
+| Testing procedure and journeys | [`testing/`](testing/README.md) |
+
+`schemas/`, `examples/`, `knowledge/toolkit/` and `VERSION` are copied from the extension
+repository by `npm run sync:common`; do not edit them here.
 
 ## What a client prepares
 
@@ -46,8 +48,3 @@ Start from the common bridge template, [`templates/bridge/`](templates/bridge/):
 - Every id is declared before it is referenced.
 - DataPass never executes client files during discovery.
 - DataPass never provisions cloud resources.
-
-## Planned sections
-
-`knowledge/` (cloud features and what each MCP server does), `testing/` (the test batteries a client
-can ask for), `formats/` (release-synced copies).
