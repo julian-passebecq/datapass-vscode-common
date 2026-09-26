@@ -28,6 +28,8 @@ These links point at the source repository. A release-synced copy will be added 
 
 ## What a client prepares
 
+Start from the common bridge template, [`templates/bridge/`](templates/bridge/): every file with marked placeholders, and [`EXPECTATIONS.md`](templates/bridge/EXPECTATIONS.md) saying, per file and field, what DataPass provides and what you fill, and when.
+
 1. **Code repositories:** native, with no DataPass file, each runnable and tested on its own.
 2. **A bridge repository:**
    - `AGENTS.md`, `README.md` and `docs/ARCHITECTURE.md`;

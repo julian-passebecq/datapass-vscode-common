@@ -1,0 +1,25 @@
+{
+  "format": "datapass.sheet",
+  "version": "1",
+  "summary": "TODO-CLIENT: order of magnitude of the data in one sentence (e.g. about 1,000 files a month, one JSON result each).",
+  "asOf": "2026-09-26",
+  "datasets": [
+    {
+      "id": "results",
+      "label": "TODO-CLIENT: results",
+      "componentId": "results",
+      "kind": "files",
+      "files": "TODO-CLIENT: ≈ how many",
+      "producedBy": [ "process" ],
+      "columns": [
+        { "name": "source_id", "type": "string", "role": "key", "meaning": "TODO-CLIENT: identifier of the input" }
+      ]
+    }
+  ],
+  "runtimes": [
+    { "id": "process-host", "label": "Where the processing runs", "runs": [ "process" ], "host": "TODO-CLIENT: laptop, VM, Function App…", "decisionRef": "run" }
+  ],
+  "glossary": [
+    { "term": "TODO-CLIENT: a word of the project", "meaning": "TODO-CLIENT: what it means here" }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "format": "datapass.options",
+  "version": "1",
+  "title": "TODO-CLIENT: project — architecture options",
+  "description": "TODO-CLIENT: what is still undecided. graph.json is the current option; each alternative only lists how it differs. Previewing a variant in DataPass writes and deploys nothing.",
+  "currency": "USD",
+  "criteria": [
+    { "id": "cost", "label": "Monthly cost (declared)", "better": "lower" },
+    { "id": "setup", "label": "Setup effort", "description": "5 = quick to set up", "better": "higher" }
+  ],
+  "decisions": [
+    {
+      "id": "run",
+      "title": "TODO-CLIENT: the question this decision answers (e.g. what starts the processing?)",
+      "level": "orchestration",
+      "subproject": "pipeline",
+      "concerns": [ "process" ],
+      "current": "script",
+      "options": [
+        {
+          "id": "script",
+          "label": "A — script (current)",
+          "summary": "TODO-CLIENT: the current way, exactly as graph.json describes it.",
+          "values": { "cost": "≈ 1", "setup": { "score": 5 } },
+          "pros": [ "Nothing to deploy" ],
+          "cons": [ "Someone or a scheduler must start it" ],
+          "costs": [
+            { "label": "Storage account holding the input and the results (the same in every option)", "service": "Azure Blob Storage",
+              "price": "Hot LRS, about 0.02 USD per GB-month, 50 GB", "monthly": 1, "shared": "storage",
+              "source": "https://azure.microsoft.com/pricing/details/storage/blobs/", "asOf": "2026-09-26",
+              "note": "Template figure: replace it with your own volume, source and date." }
+          ]
+        },
+        {
+          "id": "function",
+          "label": "B — event + Azure Function",
+          "summary": "TODO-CLIENT: an alternative, described by its changes to graph.json.",
+          "changes": {
+            "replace": [
+              { "id": "process", "kind": "function", "label": "TODO-CLIENT: processing (Function)", "provider": "azure-functions",
+                "artifacts": { "profile": "azure-functions.python", "root": "functions/process" } }
+            ]
+          },
+          "values": { "cost": "≈ 1 within the free grant", "setup": { "score": 3 } },
+          "pros": [ "Runs as soon as data arrives" ],
+          "cons": [ "A Function App to deploy and monitor" ],
+          "costs": [
+            { "label": "Functions Consumption plan, a few thousand runs a month", "service": "Azure Functions",
+              "price": "first 1 million executions a month free", "monthly": 0,
+              "source": "https://azure.microsoft.com/pricing/details/functions/", "asOf": "2026-09-26" },
+            { "label": "Storage account holding the input and the results (the same in every option)", "service": "Azure Blob Storage",
+              "price": "Hot LRS, about 0.02 USD per GB-month, 50 GB", "monthly": 1, "shared": "storage",
+              "source": "https://azure.microsoft.com/pricing/details/storage/blobs/", "asOf": "2026-09-26",
+              "note": "Template figure: replace it with your own volume, source and date." }
+          ]
+        }
+      ]
+    }
+  ],
+  "scenarios": [
+    { "id": "a-script", "title": "A — script", "picks": [ "run=script" ], "description": "The current architecture." },
+    { "id": "b-function", "title": "B — event + Function", "picks": [ "run=function" ], "description": "TODO-CLIENT: why someone would pick it." }
+  ]
+}

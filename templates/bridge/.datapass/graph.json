@@ -1,0 +1,23 @@
+{
+  "format": "datapass.graph",
+  "version": "0.2",
+  "items": [
+    { "id": "inbox", "kind": "storage", "label": "TODO-CLIENT: input storage", "provider": "azure-storage",
+      "description": "TODO-CLIENT: where the input data arrives (a Blob container, a lakehouse folder…)." },
+    {
+      "id": "process", "kind": "script", "label": "TODO-CLIENT: processing", "provider": "python",
+      "description": "TODO-CLIENT: what the code does. Folder and entry file are relative to the pipeline repository.",
+      "artifacts": { "profile": "python.script", "root": "processing", "entry": "process.py", "files": [ { "path": "tests", "role": "test", "optional": true } ] },
+      "operations": [ { "capability": "python.tests.run" } ],
+      "checklist": [ { "id": "tests", "label": "One command runs the tests of this component" } ]
+    },
+    { "id": "results", "kind": "storage", "label": "TODO-CLIENT: output storage", "provider": "azure-storage" },
+    { "id": "infra-code", "kind": "artifact-bundle", "label": "TODO-CLIENT: infrastructure as code (planned)", "provider": "bicep", "status": "planned",
+      "artifacts": { "repoRef": "infra", "profile": "bicep", "root": "." } }
+  ],
+  "relations": [
+    { "id": "r1", "source": "process", "target": "inbox", "relation": "consumes" },
+    { "id": "r2", "source": "process", "target": "results", "relation": "produces" },
+    { "id": "r3", "source": "inbox", "target": "infra-code", "relation": "deployedFrom" }
+  ]
+}
