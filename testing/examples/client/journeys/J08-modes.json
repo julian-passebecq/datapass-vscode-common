@@ -1,12 +1,13 @@
 {
   "format": "datapass.test-journey",
   "version": 1,
-  "kind": "client",
   "id": "J08",
+  "kind": "client",
   "title": "Use DataPass with the fewest panels, then the full view",
   "as": "occasional user",
   "goal": "Work with the fewest DataPass panels, then switch to the full view when needed.",
   "setup": {
+    "client": "codex-wind-lab",
     "mode": "Vanilla"
   },
   "hints": [

@@ -1,12 +1,13 @@
 {
   "format": "datapass.test-journey",
   "version": 1,
-  "kind": "client",
   "id": "J03",
+  "kind": "client",
   "title": "Prepare the dev deployment of the publish function (variant C)",
   "as": "client engineer, cloud beginner",
   "goal": "Know exactly what is needed to deploy the publish function to dev under variant C, and hand the preparation to an AI.",
   "setup": {
+    "client": "codex-wind-lab",
     "mode": "Standard",
     "variant": "C",
     "environment": "dev"

@@ -1,0 +1,94 @@
+{
+  "format": "datapass.codex-tests",
+  "version": 1,
+  "purpose": "app",
+  "datapass": {
+    "version": "0.26.0",
+    "vsix": "vsix/datapass-vscode-0.26.0.vsix"
+  },
+  "workspaces": [
+    {
+      "id": "doc-pipeline",
+      "title": "DataPass example: Document pipeline",
+      "bridge": {
+        "remote": "https://github.com/julian-passebecq/datapass-vscode",
+        "folder": "datapass-vscode",
+        "path": "examples/v3/doc-pipeline"
+      },
+      "repositories": []
+    },
+    {
+      "id": "research-library",
+      "title": "DataPass example: Research library",
+      "bridge": {
+        "remote": "https://github.com/julian-passebecq/datapass-vscode",
+        "folder": "datapass-vscode",
+        "path": "examples/v3/research-library"
+      },
+      "repositories": []
+    },
+    {
+      "id": "sales-bi",
+      "title": "DataPass example: Sales BI",
+      "bridge": {
+        "remote": "https://github.com/julian-passebecq/datapass-vscode",
+        "folder": "datapass-vscode",
+        "path": "examples/v3/sales-bi"
+      },
+      "repositories": []
+    },
+    {
+      "id": "shop-platform",
+      "title": "DataPass example: Shop platform",
+      "bridge": {
+        "remote": "https://github.com/julian-passebecq/datapass-vscode",
+        "folder": "datapass-vscode",
+        "path": "examples/v3/shop-platform"
+      },
+      "repositories": []
+    },
+    {
+      "id": "catalog-import",
+      "title": "DataPass example: Supplier catalogue import",
+      "bridge": {
+        "remote": "https://github.com/julian-passebecq/datapass-vscode",
+        "folder": "datapass-vscode",
+        "path": "examples/v3/catalog-import"
+      },
+      "repositories": []
+    },
+    {
+      "id": "codex-wind-lab",
+      "title": "Codex Wind Lab (fictional client)",
+      "bridge": {
+        "remote": "https://github.com/julian-passebecq/codex-datapass-bridge",
+        "folder": "codex-datapass-bridge"
+      },
+      "repositories": [
+        {
+          "remote": "https://github.com/julian-passebecq/datapass-codex-fakeclient",
+          "folder": "wind-study-2d"
+        },
+        {
+          "remote": "https://github.com/julian-passebecq/datapass-codex-fakeclient2",
+          "folder": "wind-blade-3d"
+        },
+        {
+          "remote": "https://github.com/julian-passebecq/datapass-codex-fakeclient3",
+          "folder": "wind-platform"
+        }
+      ]
+    }
+  ],
+  "journeys": [
+    "journeys/A01-switch-projects.json"
+  ],
+  "report": {
+    "remote": "https://github.com/julian-passebecq/datapass-codex-test",
+    "folder": "reports/app"
+  },
+  "limits": {
+    "runMinutes": 120,
+    "journeyMinutes": 20
+  }
+}

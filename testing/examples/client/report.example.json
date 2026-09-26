@@ -1,0 +1,125 @@
+{
+  "format": "datapass.qa-report",
+  "version": 1,
+  "purpose": "client",
+  "runId": "20260927-0930-codex-wind-lab",
+  "datapass": {
+    "version": "0.26.0",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "commit": "c78f01f"
+  },
+  "vscode": {
+    "version": "1.139.1"
+  },
+  "os": {
+    "platform": "win32",
+    "release": "10.0.26200",
+    "arch": "x64"
+  },
+  "clients": [
+    {
+      "id": "codex-wind-lab",
+      "title": "Codex Wind Lab (fictional)",
+      "bridge": {
+        "folder": "codex-datapass-bridge",
+        "remote": "https://github.com/julian-passebecq/codex-datapass-bridge",
+        "commit": "1111111111111111111111111111111111111111"
+      },
+      "repositories": [
+        {
+          "folder": "wind-study-2d",
+          "remote": "https://github.com/julian-passebecq/datapass-codex-fakeclient",
+          "commit": "2222222222222222222222222222222222222222"
+        }
+      ]
+    }
+  ],
+  "agent": {
+    "tool": "codex",
+    "model": "example-model",
+    "host": "app"
+  },
+  "startedAt": "2026-09-27T09:30:00Z",
+  "finishedAt": "2026-09-27T09:52:00Z",
+  "journeys": [
+    {
+      "id": "J01",
+      "outcome": "reached",
+      "minutes": 6,
+      "path": [
+        "Ran DataPass: Open a Client Project… with the bridge URL",
+        "Opened the Architecture panel"
+      ],
+      "expected": [
+        {
+          "text": "The workspace opens with the bridge first, then the three code repositories",
+          "met": true
+        },
+        {
+          "text": "No sign-in and no cloud call is asked for",
+          "met": "unclear"
+        }
+      ],
+      "screens": [
+        "screens/J01-architecture.png"
+      ]
+    },
+    {
+      "id": "J02",
+      "outcome": "partly",
+      "minutes": 14,
+      "path": [
+        "Opened Compare Architecture Options",
+        "Switched to variant B"
+      ],
+      "expected": [
+        {
+          "text": "The learning-only cost line is labelled as such and not added to the production total",
+          "met": false
+        }
+      ],
+      "screens": [
+        "screens/J02-costs.png"
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "journey": "J02",
+      "severity": "major",
+      "area": "costs",
+      "title": "The learning-only line is added to the production total",
+      "steps": [
+        "Open Compare Architecture Options",
+        "Select variant B"
+      ],
+      "expected": "The learning-only line is labelled and excluded",
+      "actual": "It is included in the monthly total",
+      "screens": [
+        "screens/J02-costs.png"
+      ],
+      "suggestion": "Show learning-only lines under the total"
+    }
+  ],
+  "answers": [],
+  "clientFeedback": [
+    "QUESTIONS.md: the difference between shared and learning-only cost lines was unclear"
+  ],
+  "coverage": {
+    "listed": [
+      "onboarding",
+      "workspace",
+      "architecture",
+      "variants",
+      "options",
+      "costs"
+    ],
+    "reached": [
+      "onboarding",
+      "workspace",
+      "architecture",
+      "variants"
+    ]
+  }
+}

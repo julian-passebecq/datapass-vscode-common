@@ -2,7 +2,8 @@
 
 A journey lists the DataPass features it exercises (`features`), and a finding names the one it
 concerns (`area`). Both use this fixed list, so each run shows which features it covered. A tag
-not in this list makes the file invalid.
+not in this list makes the file invalid. The list is the one DataPass's validator uses
+(`FEATURES` in `src/qa/formats.ts` of datapass-vscode).
 
 | Tag | What it covers |
 |---|---|
@@ -25,3 +26,6 @@ not in this list makes the file invalid.
 | `file-versions` | Keeping and comparing older versions of a file |
 | `toolkit` | The Toolkit: tools, prices, recipes |
 | `mcp` | MCP servers: what they are, what they reach, what they send to a model |
+| `install` | Installing, updating, disabling and uninstalling the DataPass VSIX; the first start |
+| `docs` | DataPass's own help: walkthrough, guides, messages that explain what to do |
+| `performance` | Responsiveness: start time, freezes, large workspaces |

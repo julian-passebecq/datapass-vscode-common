@@ -1,12 +1,13 @@
 {
   "format": "datapass.test-journey",
   "version": 1,
-  "kind": "client",
   "id": "J05",
+  "kind": "client",
   "title": "See what my VM needs and what DataPass really knows about it",
   "as": "operations engineer",
   "goal": "Understand what the Docker \"VM\" of variant B needs, and how DataPass shows that it has not observed it running.",
   "setup": {
+    "client": "codex-wind-lab",
     "mode": "DataPass",
     "variant": "B"
   },

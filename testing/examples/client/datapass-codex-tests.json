@@ -1,0 +1,53 @@
+{
+  "format": "datapass.codex-tests",
+  "version": 1,
+  "purpose": "client",
+  "client": {
+    "id": "codex-wind-lab",
+    "title": "Codex Wind Lab (fictional)"
+  },
+  "datapass": {
+    "version": "0.26.0",
+    "vsix": "vsix/datapass-vscode-0.26.0.vsix"
+  },
+  "workspace": {
+    "bridge": {
+      "remote": "https://github.com/julian-passebecq/codex-datapass-bridge",
+      "folder": "codex-datapass-bridge"
+    },
+    "repositories": [
+      {
+        "remote": "https://github.com/julian-passebecq/datapass-codex-fakeclient",
+        "folder": "wind-study-2d"
+      },
+      {
+        "remote": "https://github.com/julian-passebecq/datapass-codex-fakeclient2",
+        "folder": "wind-blade-3d"
+      },
+      {
+        "remote": "https://github.com/julian-passebecq/datapass-codex-fakeclient3",
+        "folder": "wind-platform"
+      }
+    ]
+  },
+  "journeys": [
+    "journeys/J01-open-my-project.json",
+    "journeys/J02-choose-a-variant.json",
+    "journeys/J03-prepare-dev-deployment.json",
+    "journeys/J04-ai-on-a-file.json",
+    "journeys/J05-vm-needs.json",
+    "journeys/J06-repository-status.json",
+    "journeys/J07-check-bridge-files.json",
+    "journeys/J08-modes.json",
+    "journeys/J09-file-versions.json",
+    "journeys/J10-tools-and-mcp.json"
+  ],
+  "report": {
+    "remote": "https://github.com/julian-passebecq/datapass-codex-test",
+    "folder": "reports/client"
+  },
+  "limits": {
+    "runMinutes": 120,
+    "journeyMinutes": 20
+  }
+}

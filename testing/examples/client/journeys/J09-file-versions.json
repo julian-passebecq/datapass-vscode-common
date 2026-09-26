@@ -1,12 +1,13 @@
 {
   "format": "datapass.test-journey",
   "version": 1,
-  "kind": "client",
   "id": "J09",
+  "kind": "client",
   "title": "Keep an older version of a file and compare it",
   "as": "client engineer",
   "goal": "Keep an older version of a model file and compare it with the current one.",
   "setup": {
+    "client": "codex-wind-lab",
     "mode": "DataPass"
   },
   "hints": [
