@@ -1,0 +1,50 @@
+{
+  "format": "datapass.catalog",
+  "version": "1",
+  "title": "Example organisation — projects",
+  "description": "Entry points only: each project keeps its own .datapass/project.json in its coordination repository.",
+  "projects": [
+    {
+      "id": "research-library",
+      "title": "Research library",
+      "organization": "Example Org",
+      "description": "PDF papers to reviewed knowledge in MongoDB.",
+      "repository": {
+        "url": "https://github.com/example-org/research-hub",
+        "branch": "main"
+      },
+      "tags": [
+        "azure",
+        "documents"
+      ]
+    },
+    {
+      "id": "catalog-import",
+      "title": "Supplier catalogue import",
+      "organization": "Example Org",
+      "description": "CSV cleaning into PostgreSQL (Neon).",
+      "repository": {
+        "url": "https://github.com/example-org/catalog-import",
+        "branch": "main"
+      },
+      "tags": [
+        "python",
+        "postgres"
+      ]
+    },
+    {
+      "id": "sales-bi",
+      "title": "Sales BI",
+      "organization": "Example Org",
+      "description": "Fabric lakehouse and Power BI model, deployed with fabric-cicd (manifest v5).",
+      "repository": {
+        "url": "https://github.com/example-org/sales-bi",
+        "branch": "main"
+      },
+      "tags": [
+        "fabric",
+        "powerbi"
+      ]
+    }
+  ]
+}
