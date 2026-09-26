@@ -1,0 +1,28 @@
+{
+  "format": "datapass.test-journey",
+  "version": 1,
+  "kind": "client",
+  "id": "J10",
+  "title": "Check the tools and MCP servers my project needs",
+  "as": "client engineer",
+  "goal": "See which tools and MCP servers the project needs, what is installed here, and what each MCP server would send to a model.",
+  "setup": {
+    "mode": "DataPass"
+  },
+  "hints": [
+    "The Toolkit",
+    "Readiness: integration evidence"
+  ],
+  "expected": [
+    "Needed tools are listed with installed / missing and an install command to copy",
+    "Each MCP server says what it can read or change and what it sends to a model",
+    "A registration file is never shown as a working connection"
+  ],
+  "features": [
+    "toolkit",
+    "mcp"
+  ],
+  "outOfScope": [
+    "installing anything automatically"
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "format": "datapass.test-journey",
+  "version": 1,
+  "kind": "client",
+  "id": "J02",
+  "title": "Compare variants A, B and C",
+  "as": "project lead",
+  "goal": "Compare variants A, B and C, including the monthly cost, and understand which cost line is only for learning.",
+  "setup": {
+    "mode": "Standard"
+  },
+  "hints": [
+    "DataPass: Compare Architecture Options",
+    "The status bar shows the selected variant"
+  ],
+  "expected": [
+    "A, B and C are listed with their components",
+    "Switching the selected variant changes the Project tree and the diagram",
+    "The shared storage cost is counted once",
+    "The learning-only cost line is labelled as such and not added to the production total"
+  ],
+  "features": [
+    "variants",
+    "options",
+    "costs"
+  ],
+  "outOfScope": [
+    "recording a decision"
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "format": "datapass.test-journey",
+  "version": 1,
+  "kind": "client",
+  "id": "J08",
+  "title": "Use DataPass with the fewest panels, then the full view",
+  "as": "occasional user",
+  "goal": "Work with the fewest DataPass panels, then switch to the full view when needed.",
+  "setup": {
+    "mode": "Vanilla"
+  },
+  "hints": [
+    "DataPass: Switch Mode…"
+  ],
+  "expected": [
+    "Vanilla and Standard show fewer surfaces than DataPass and Advanced",
+    "Switching mode keeps the project open and loses nothing",
+    "Safety actions stay reachable in every mode"
+  ],
+  "features": [
+    "modes"
+  ],
+  "outOfScope": [
+    "customizing every surface"
+  ]
+}

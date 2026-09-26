@@ -1,0 +1,27 @@
+{
+  "format": "datapass.test-journey",
+  "version": 1,
+  "kind": "client",
+  "id": "J07",
+  "title": "Check that my bridge files are correct",
+  "as": "client AI or engineer who wrote the bridge",
+  "goal": "See whether the bridge's .datapass files are correct, and understand each error well enough to fix it.",
+  "setup": {
+    "mode": "Standard"
+  },
+  "hints": [
+    "The Problems panel",
+    "DataPass: Open Project Manifest"
+  ],
+  "expected": [
+    "Format problems appear in the Problems panel with the file and field",
+    "Each message says what is wrong and what is expected",
+    "A correct bridge shows no DataPass problem"
+  ],
+  "features": [
+    "format-checks"
+  ],
+  "outOfScope": [
+    "editing the client's code"
+  ]
+}

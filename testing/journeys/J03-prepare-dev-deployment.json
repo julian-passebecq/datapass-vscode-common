@@ -1,0 +1,35 @@
+{
+  "format": "datapass.test-journey",
+  "version": 1,
+  "kind": "client",
+  "id": "J03",
+  "title": "Prepare the dev deployment of the publish function (variant C)",
+  "as": "client engineer, cloud beginner",
+  "goal": "Know exactly what is needed to deploy the publish function to dev under variant C, and hand the preparation to an AI.",
+  "setup": {
+    "mode": "Standard",
+    "variant": "C",
+    "environment": "dev"
+  },
+  "hints": [
+    "Start from the Architecture panel",
+    "Readiness shows what is missing"
+  ],
+  "expected": [
+    "The function component shows its repository, folder and the dev target",
+    "Readiness lists the tools needed (Python, Azure Functions extension) and marks cloud evidence as not observed",
+    "A work order or Copy Context pack names variant C, dev and the bridge revision",
+    "Nothing is deployed and no sign-in is asked for"
+  ],
+  "features": [
+    "architecture",
+    "variants",
+    "readiness",
+    "evidence",
+    "work-orders",
+    "stamps"
+  ],
+  "outOfScope": [
+    "real Azure deployment"
+  ]
+}

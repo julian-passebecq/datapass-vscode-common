@@ -1,0 +1,26 @@
+{
+  "format": "datapass.test-journey",
+  "version": 1,
+  "kind": "client",
+  "id": "J09",
+  "title": "Keep an older version of a file and compare it",
+  "as": "client engineer",
+  "goal": "Keep an older version of a model file and compare it with the current one.",
+  "setup": {
+    "mode": "DataPass"
+  },
+  "hints": [
+    "The file's context menu"
+  ],
+  "expected": [
+    "An older version can be kept and found again",
+    "The comparison opens in VS Code's diff view",
+    "The repository's history is not rewritten"
+  ],
+  "features": [
+    "file-versions"
+  ],
+  "outOfScope": [
+    "restoring over uncommitted work"
+  ]
+}
