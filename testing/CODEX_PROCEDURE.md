@@ -57,12 +57,21 @@ There are two kinds of run. Do the **app tests** first, then the **client journe
    **released commit** of `datapass.version`. The repository has no tags, so each release's commit
    is listed below.
 
+   Build it in a separate clone, `dp-release`: the `datapass-vscode` clone stays on `main`, where
+   the preparation helper lives.
+
    ```
-   cd <run root>\datapass-vscode
+   # ✔ verified with 0.26.0
+   cd <run root>
+   git clone datapass-vscode dp-release
+   cd dp-release
    git checkout <released commit>
    npm ci
-   npx vsce package --out ..\vsix\
+   npm run build
+   npx vsce package --out ..\vsix\datapass-vscode-<version>.vsix
    ```
+
+   `npm run build` is needed: without it `vsce` stops with "Extension entrypoint(s) missing".
 
    | DataPass version | Released commit |
    |---|---|
@@ -86,13 +95,15 @@ There are two kinds of run. Do the **app tests** first, then the **client journe
    - Exit code 2 means it cannot prepare, and the reason is printed. Fix your clone (not
      DataPass) or write a `blocked` finding.
 
+   ✔ Verified end to end with 0.26.0: the helper installs into `<root>\.vscode-ext` and
+   `<root>\.vscode-user`. Its printed launch line has no `--disable-workspace-trust`: add it (step 5).
    The install it runs is the verified one. By hand it is:
 
    ```powershell
    # ✔ install into an isolated profile (works from Codex's sandbox too)
-   code --user-data-dir "<root>\vscode-user" --extensions-dir "<root>\vscode-ext" --install-extension "<root>\vsix\datapass-vscode-<version>.vsix"
+   code --user-data-dir "<root>\.vscode-user" --extensions-dir "<root>\.vscode-ext" --install-extension "<root>\vsix\datapass-vscode-<version>.vsix"
    # ✔ check: only DataPass is listed
-   code --user-data-dir "<root>\vscode-user" --extensions-dir "<root>\vscode-ext" --list-extensions --show-versions
+   code --user-data-dir "<root>\.vscode-user" --extensions-dir "<root>\.vscode-ext" --list-extensions --show-versions
    ```
 
 5. **Launch the isolated VS Code outside the sandbox.**
@@ -103,7 +114,7 @@ There are two kinds of run. Do the **app tests** first, then the **client journe
 
    ```powershell
    # ✔ launch — OUTSIDE the Codex sandbox
-   & "$env:LOCALAPPDATA\Programs\Microsoft VS Code\Code.exe" --user-data-dir "<root>\vscode-user" --extensions-dir "<root>\vscode-ext" --new-window --disable-workspace-trust "<root>\<workspace>.code-workspace"
+   & "$env:LOCALAPPDATA\Programs\Microsoft VS Code\Code.exe" --user-data-dir "<root>\.vscode-user" --extensions-dir "<root>\.vscode-ext" --new-window --disable-workspace-trust "<root>\<workspace>.code-workspace"
    ```
 
    - `--disable-workspace-trust` makes the run **trusted**. In Restricted Mode DataPass reads files
@@ -179,5 +190,5 @@ Goal: learn whether a client reaches its goals with DataPass, and where it gets 
 - Stop at the config's `limits.runMinutes` (two hours by default).
 - When something blocks the whole run (VS Code does not start, the VSIX does not install), write
   one `blocked` finding with the exact error and stop.
-- At the end, close the isolated VS Code and delete `<run root>\vscode-user` and
-  `<run root>\vscode-ext`. Never delete `%USERPROFILE%\.vscode-shared`.
+- At the end, close the isolated VS Code and delete `<run root>\.vscode-user` and
+  `<run root>\.vscode-ext`. Never delete `%USERPROFILE%\.vscode-shared`.
