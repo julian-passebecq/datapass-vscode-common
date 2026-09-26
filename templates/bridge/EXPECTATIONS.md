@@ -45,7 +45,7 @@ VS Code, DataPass checks the files as you type and lists **Problems in project f
 | `schemaVersion` | `5` | — (write `4` only for someone still on DataPass 0.14–0.17) | — |
 | `project.id` | `example-project` | A lowercase id, `^[a-z][a-z0-9_.-]*$` | 1 |
 | `project.title`, `description` | placeholders | Plain words | 1 |
-| `project.type` | `work` (a client project: the person merges, work orders off) | Keep `work`; `dev` / `perso` are for internal projects | 1 |
+| `project.type` | `dev` (the owning AI merges on green CI; work orders stay off until `modules.workOrders` is true) | Keep `dev`; use `work` only if the client wants a person to approve every merge | 1 |
 | `modules` | `azure` on, the others off | Switch on only what the project uses (`databricks`, `fabric`, `databases`, `infrastructure`, `airflow`, `powerbi`, `grafana`, `diagramcloud`); `workOrders` stays `false` unless you allow AI work orders | 1 |
 | `repositories.bridge` | `path: "."` and a remote to rename | The bridge's own remote URL | 1 |
 | `repositories.<key>` | One native repository, one `planned` repository | One key per native repository: `label`, `remote.url` (https or `git@`, never credentials; Azure DevOps Clone address accepted), `branch`, `description`. `planned: true` for one that does not exist yet | 1 |
