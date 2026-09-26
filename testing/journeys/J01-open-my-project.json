@@ -1,0 +1,29 @@
+{
+  "format": "datapass.test-journey",
+  "version": 1,
+  "kind": "client",
+  "id": "J01",
+  "title": "Open my project from its bridge URL",
+  "as": "client engineer, first day with DataPass",
+  "goal": "Open the Codex Wind Lab project from the bridge repository's URL and see the three code repositories in one architecture.",
+  "setup": {
+    "mode": "Standard"
+  },
+  "hints": [
+    "Use \"DataPass: Open a Client Project…\" with the bridge URL"
+  ],
+  "expected": [
+    "The workspace opens with the bridge first, then wind-study-2d, wind-blade-3d and wind-platform",
+    "The Architecture panel shows the components of all three repositories",
+    "Each component names its repository and folder",
+    "No sign-in and no cloud call is asked for"
+  ],
+  "features": [
+    "onboarding",
+    "workspace",
+    "architecture"
+  ],
+  "outOfScope": [
+    "cloning with credentials"
+  ]
+}

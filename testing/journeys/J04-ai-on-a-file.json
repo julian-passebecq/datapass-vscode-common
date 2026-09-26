@@ -1,0 +1,29 @@
+{
+  "format": "datapass.test-journey",
+  "version": 1,
+  "kind": "client",
+  "id": "J04",
+  "title": "Ask my AI about the pipeline file, then apply its proposal safely",
+  "as": "client engineer",
+  "goal": "Give an AI the right context for the pipeline definition in wind-platform, then bring its proposed change back without breaking anything.",
+  "setup": {
+    "mode": "DataPass"
+  },
+  "hints": [
+    "Right-click the file: Copy Context for My AI",
+    "The AI view imports a proposal"
+  ],
+  "expected": [
+    "The copied pack names the file, its component and the selected variant",
+    "The pack holds no secret-looking value",
+    "A valid proposal is shown as a reviewable change before anything is written",
+    "A proposal made against an older revision is refused with a readable reason"
+  ],
+  "features": [
+    "file-context",
+    "ai-exchange"
+  ],
+  "outOfScope": [
+    "running the pipeline"
+  ]
+}

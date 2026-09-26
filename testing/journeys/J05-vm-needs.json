@@ -1,0 +1,29 @@
+{
+  "format": "datapass.test-journey",
+  "version": 1,
+  "kind": "client",
+  "id": "J05",
+  "title": "See what my VM needs and what DataPass really knows about it",
+  "as": "operations engineer",
+  "goal": "Understand what the Docker \"VM\" of variant B needs, and how DataPass shows that it has not observed it running.",
+  "setup": {
+    "mode": "DataPass",
+    "variant": "B"
+  },
+  "hints": [
+    "Resources and Readiness"
+  ],
+  "expected": [
+    "The VM resource is listed with its declared settings",
+    "It is shown as declared, not observed",
+    "Nothing is started by DataPass"
+  ],
+  "features": [
+    "resources",
+    "readiness",
+    "evidence"
+  ],
+  "outOfScope": [
+    "starting Docker"
+  ]
+}

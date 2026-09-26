@@ -1,0 +1,26 @@
+{
+  "format": "datapass.test-journey",
+  "version": 1,
+  "kind": "client",
+  "id": "J06",
+  "title": "Find which repositories have changes, open PRs or failing CI",
+  "as": "project lead",
+  "goal": "See at a glance which of my repositories have local changes, open pull requests or failing CI.",
+  "setup": {
+    "mode": "Standard"
+  },
+  "hints": [
+    "The Git view"
+  ],
+  "expected": [
+    "Every repository of the project is listed",
+    "Local changes, ahead/behind and open pull requests are shown per repository",
+    "Links open the host's pages; nothing is pushed or merged"
+  ],
+  "features": [
+    "git"
+  ],
+  "outOfScope": [
+    "merging a pull request"
+  ]
+}
