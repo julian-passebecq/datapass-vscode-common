@@ -1,8 +1,12 @@
 # Tester procedure (Codex)
 
-> **Status: design procedure, not yet verified on the real Codex.** The commands below are the
-> intended ones. They will be replaced by the commands verified on Windows. Until then, when a
-> command fails, write a `blocked` finding with the exact error and stop that step.
+> **Status (2026-09-26).** Checked with Codex on Windows 11 and VS Code 1.139:
+>
+> - **Verified:** installing the VSIX into an isolated profile (from Codex's sandbox too), and
+>   launching the isolated VS Code outside the sandbox. These lines are marked ✔.
+> - **Not verified yet:** a whole run inside the Codex desktop app with Computer Use.
+>
+> When a command fails, write a `blocked` finding with the exact error and stop that step.
 
 There are two kinds of run. Do the **app tests** first, then the **client journeys**.
 
@@ -22,6 +26,24 @@ There are two kinds of run. Do the **app tests** first, then the **client journe
   (`az`, `func`, `databricks`, `fab`) and never deploy anything. Docker is optional.
 - You never use the machine's normal VS Code profile, only the isolated one below.
 - Findings and answers are claims: write what you saw, with a screenshot or a log line.
+
+## Where you run
+
+- **Host: the Codex desktop app**, in an interactive thread with the Computer Use plugin on.
+  - The Codex CLI (`codex exec`) cannot do the UI part: from it, Computer Use sees no app or
+    window at all.
+  - Shell steps (clone, build, install) work in either host.
+- **Computer Use on Windows works only in the foreground.**
+  - It takes over the mouse and keyboard of the active desktop, which must stay visible and
+    unlocked for the whole run.
+  - Nobody can use the PC at the same time. Run when the person is away, or in a Windows virtual
+    machine.
+- **The person at the PC must approve two things once, in the app:**
+  - Computer Use for VS Code (`Code.exe`), with **Always allow**;
+  - the launch of VS Code outside the sandbox (step 5).
+- **Say it up front.** Start the thread by stating that the VSIX is the user's own build and that
+  installing it into the isolated folders is authorized. Otherwise Codex stops to ask before
+  installing "software from an unrecognized source". Expect one confirmation turn anyway.
 
 ## Common setup (both kinds)
 
@@ -49,9 +71,11 @@ There are two kinds of run. Do the **app tests** first, then the **client journe
    For a later release, DataPass's team adds its commit to this table. `qa:prepare` records the
    VSIX's sha256.
 
-4. **Prepare the run.** This validates the settings and checks each folder's remote. It installs
-   the VSIX into an isolated profile and records its sha256. It writes the `.code-workspace`
-   file(s) and `run.json`:
+4. **Prepare the run.** The helper does the following:
+   - validates the settings;
+   - checks each folder's remote;
+   - installs the VSIX into an isolated profile and records its sha256;
+   - writes the `.code-workspace` file(s) and `run.json`.
 
    ```
    cd <run root>\datapass-vscode
@@ -62,14 +86,48 @@ There are two kinds of run. Do the **app tests** first, then the **client journe
    - Exit code 2 means it cannot prepare, and the reason is printed. Fix your clone (not
      DataPass) or write a `blocked` finding.
 
-5. **Launch** the isolated VS Code with the command `qa:prepare` printed. It has this shape:
+   The install it runs is the verified one. By hand it is:
 
-   ```
-   code --user-data-dir <run root>\.vscode-user --extensions-dir <run root>\.vscode-ext <run root>\<workspace>.code-workspace
+   ```powershell
+   # ✔ install into an isolated profile (works from Codex's sandbox too)
+   code --user-data-dir "<root>\vscode-user" --extensions-dir "<root>\vscode-ext" --install-extension "<root>\vsix\datapass-vscode-<version>.vsix"
+   # ✔ check: only DataPass is listed
+   code --user-data-dir "<root>\vscode-user" --extensions-dir "<root>\vscode-ext" --list-extensions --show-versions
    ```
 
-   Trust the workspace when VS Code asks. If the first-run walkthrough opens, keep it: it is part
-   of the test.
+5. **Launch the isolated VS Code outside the sandbox.**
+   - From Codex's sandbox, VS Code installs extensions but cannot open a window: the GPU process
+     dies and its storage is read-only.
+   - So ask for an escalated (unsandboxed) run for this one command, or use the launch command
+     `qa:prepare` printed:
+
+   ```powershell
+   # ✔ launch — OUTSIDE the Codex sandbox
+   & "$env:LOCALAPPDATA\Programs\Microsoft VS Code\Code.exe" --user-data-dir "<root>\vscode-user" --extensions-dir "<root>\vscode-ext" --new-window --disable-workspace-trust "<root>\<workspace>.code-workspace"
+   ```
+
+   - `--disable-workspace-trust` makes the run **trusted**. In Restricted Mode DataPass reads files
+     but runs neither Git nor commands, so an untrusted run would test the wrong thing. Drop this
+     flag only in a journey that tests the first run itself, then click the trust dialog.
+   - A fresh profile opens VS Code's Welcome page. DataPass's walkthrough is under
+     Help → Welcome.
+   - Then use Computer Use on the window "… - Visual Studio Code" and nothing else.
+
+6. **Screenshots.** Computer Use sees the screen but saves no file. Save each screenshot with a
+   shell command, run escalated like the launch, for example:
+
+   ```powershell
+   Add-Type -AssemblyName System.Windows.Forms, System.Drawing
+   $b = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
+   $img = New-Object System.Drawing.Bitmap $b.Width, $b.Height
+   [System.Drawing.Graphics]::FromImage($img).CopyFromScreen($b.Location, [System.Drawing.Point]::Empty, $b.Size)
+   $img.Save("<report folder>\screens\<journey>-<nn>.png")
+   ```
+
+**Isolation is not total.** `--user-data-dir` and `--extensions-dir` isolate settings and
+extensions, but VS Code still opens a machine-wide store,
+`%USERPROFILE%\.vscode-shared\sharedStorage\state.vscdb` (UI state only). Leave it alone: never
+delete it.
 
 ## App tests (vsixtest)
 
@@ -117,4 +175,5 @@ Goal: learn whether a client reaches its goals with DataPass, and where it gets 
 - Stop at the config's `limits.runMinutes` (two hours by default).
 - When something blocks the whole run (VS Code does not start, the VSIX does not install), write
   one `blocked` finding with the exact error and stop.
-- At the end, close the isolated VS Code and delete `<run root>\.vscode-user`.
+- At the end, close the isolated VS Code and delete `<run root>\vscode-user` and
+  `<run root>\vscode-ext`. Never delete `%USERPROFILE%\.vscode-shared`.
