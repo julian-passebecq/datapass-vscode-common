@@ -31,14 +31,23 @@ There are two kinds of run. Do the **app tests** first, then the **client journe
    each one names. Also clone `https://github.com/julian-passebecq/datapass-vscode` into
    `datapass-vscode`: the preparation helper (and, if needed, the VSIX) come from it.
 3. **Get the VSIX** named by `datapass.vsix` (a local path under the run root). There is no
-   download. If the file is not there, build it from the release tag:
+   download and no GitHub release. If the file is not there, build it locally from the
+   **released commit** of `datapass.version`. The repository has no tags, so each release's commit
+   is listed below.
 
    ```
    cd <run root>\datapass-vscode
-   git checkout v<datapass.version>
+   git checkout <released commit>
    npm ci
    npx vsce package --out ..\vsix\
    ```
+
+   | DataPass version | Released commit |
+   |---|---|
+   | 0.26.0 | `c78f01f` |
+
+   For a later release, DataPass's team adds its commit to this table. `qa:prepare` records the
+   VSIX's sha256.
 
 4. **Prepare the run.** This validates the settings and checks each folder's remote. It installs
    the VSIX into an isolated profile and records its sha256. It writes the `.code-workspace`

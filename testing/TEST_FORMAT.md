@@ -77,7 +77,7 @@ between. Each one gets its own `.code-workspace` file.
 | `purpose` | `app` (test the VSIX itself, several workspaces) or `client` (one client's journeys) |
 | `client` | `id` (lowercase, used in run ids) and a display `title` |
 | `datapass.version` | The DataPass release under test |
-| `datapass.vsix` | The VSIX file, **a local path** relative to the run root. See [CODEX_PROCEDURE.md](CODEX_PROCEDURE.md) for how to build it from the release tag |
+| `datapass.vsix` | The VSIX file, **a local path** relative to the run root. See [CODEX_PROCEDURE.md](CODEX_PROCEDURE.md) for how to build it from the released commit |
 | `workspace` | `client` only: the `bridge` and the native `repositories[]`, each with an https `remote` and the `folder` it is cloned into |
 | `workspaces[]` | `app` only: several projects, each with an `id`, a `title`, a `bridge` and `repositories[]`. `bridge.path` is a sub-folder inside the clone (an example inside a repository) |
 | `journeys[]` | Journey files, relative to the settings repository |
