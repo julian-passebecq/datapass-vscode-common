@@ -1,0 +1,4 @@
+.datapass/local/
+.env
+.env.*
+local.settings.json

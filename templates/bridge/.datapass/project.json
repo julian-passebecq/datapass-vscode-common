@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 5,
+  "project": {
+    "id": "example-project",
+    "title": "TODO-CLIENT: project title",
+    "description": "TODO-CLIENT: one or two sentences — what the project does, for whom. Nothing here is deployed by DataPass.",
+    "type": "work"
+  },
+  "modules": {
+    "azure": true,
+    "databricks": false,
+    "fabric": false,
+    "databases": false,
+    "infrastructure": false,
+    "airflow": false,
+    "powerbi": false,
+    "grafana": false,
+    "diagramcloud": false,
+    "workOrders": false
+  },
+  "repositories": {
+    "bridge": {
+      "path": ".",
+      "label": "Bridge (this repository)",
+      "remote": { "url": "https://github.com/YOUR-ORG/YOUR-PROJECT-bridge", "branch": "main" },
+      "description": "Links and DataPass JSON only, never code. Not part of what the client receives."
+    },
+    "pipeline": {
+      "label": "TODO-CLIENT: first native repository",
+      "remote": { "url": "https://github.com/YOUR-ORG/YOUR-PIPELINE-REPO", "branch": "main" },
+      "description": "TODO-CLIENT: what this repository holds (native files only, no DataPass file)."
+    },
+    "infra": {
+      "label": "TODO-CLIENT: a repository that does not exist yet",
+      "planned": true,
+      "description": "Planned: its components show 'planned', never 'missing'. Delete this key if you have no planned repository."
+    }
+  },
+  "environments": [
+    { "id": "dev", "title": "Development" },
+    { "id": "prod", "title": "Production", "production": true }
+  ],
+  "docs": [
+    { "label": "Architecture", "path": "docs/ARCHITECTURE.md" },
+    { "label": "Instructions for AIs", "path": "AGENTS.md" },
+    { "label": "What DataPass expects from you", "path": "EXPECTATIONS.md" }
+  ],
+  "graph": ".datapass/graph.json",
+  "localEnv": {
+    "files": [ { "path": ".env", "optional": true, "repoRef": "pipeline" } ],
+    "requiredKeys": [ "AZURE_SUBSCRIPTION_ID", "STORAGE_ACCOUNT_NAME" ]
+  },
+  "identifiers": [
+    { "id": "tenant", "label": "Entra tenant", "provider": "azure", "kind": "tenant",
+      "value": "00000000-0000-0000-0000-000000000001" },
+    { "id": "sub-data", "label": "Data subscription", "provider": "azure", "kind": "subscription", "envKey": "AZURE_SUBSCRIPTION_ID",
+      "values": { "dev": "00000000-0000-0000-0000-000000000002", "prod": "00000000-0000-0000-0000-000000000003" } },
+    { "id": "rg-data", "label": "Resource group", "provider": "azure", "kind": "resource-group",
+      "values": { "dev": "rg-example-dev", "prod": "rg-example-prod" } },
+    { "id": "storage", "label": "Storage account name", "provider": "azure", "kind": "account", "envKey": "STORAGE_ACCOUNT_NAME",
+      "values": { "dev": "stexampledev", "prod": "stexampleprod" } }
+  ],
+  "connections": [
+    { "id": "azure-dev", "label": "Azure CLI signed in to the dev subscription", "kind": "sign-in", "tool": "cli.az",
+      "identifier": "tenant", "subscription": "sub-data", "environment": "dev" }
+  ],
+  "toolchain": {
+    "tools": [
+      { "tool": "cli.git" },
+      { "tool": "cli.python", "version": ">=3.11" },
+      { "tool": "cli.az", "version": "^2.60" },
+      { "tool": "ext.python" },
+      { "tool": "ext.azure-storage" },
+      { "tool": "ext.jupyter", "optional": true }
+    ]
+  },
+  "scopes": [
+    {
+      "id": "pipeline",
+      "title": "TODO-CLIENT: sub-project title",
+      "objective": "TODO-CLIENT: the outcome of this sub-project in one sentence",
+      "repoRef": "pipeline",
+      "itemRefs": [ "inbox", "process", "results", "infra-code" ],
+      "checklist": [
+        { "id": "clone", "label": "Clone the native repository next to this bridge (or Locate it)" },
+        { "id": "ids", "label": "Replace the placeholder ids of the ID map with the real dev ids" }
+      ]
+    }
+  ],
+  "links": [
+    { "label": "DataPass common (formats, template, expectations)", "url": "https://github.com/julian-passebecq/datapass-vscode-common" }
+  ]
+}
