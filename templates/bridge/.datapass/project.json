@@ -4,7 +4,7 @@
     "id": "example-project",
     "title": "TODO-CLIENT: project title",
     "description": "TODO-CLIENT: one or two sentences — what the project does, for whom. Nothing here is deployed by DataPass.",
-    "type": "work"
+    "type": "dev"
   },
   "modules": {
     "azure": true,
