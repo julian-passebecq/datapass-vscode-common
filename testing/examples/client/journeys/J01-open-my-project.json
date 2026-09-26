@@ -1,12 +1,13 @@
 {
   "format": "datapass.test-journey",
   "version": 1,
-  "kind": "client",
   "id": "J01",
+  "kind": "client",
   "title": "Open my project from its bridge URL",
   "as": "client engineer, first day with DataPass",
   "goal": "Open the Codex Wind Lab project from the bridge repository's URL and see the three code repositories in one architecture.",
   "setup": {
+    "client": "codex-wind-lab",
     "mode": "Standard"
   },
   "hints": [

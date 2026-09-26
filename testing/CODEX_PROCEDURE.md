@@ -13,8 +13,8 @@ There are two kinds of run. Do the **app tests** first, then the **client journe
 | | App tests (vsixtest) | Client journeys (auto) |
 |---|---|---|
 | What is tested | the DataPass VSIX itself, across several projects | DataPass as one client uses it on its project |
-| Settings repository | `codex-datapass-vsixtest` (DataPass's own) | the client's auto repository |
-| Config | `purpose: "app"`, several `workspaces[]`, `QUESTIONS.md` | `purpose: "client"`, one `workspace` |
+| Settings repository | the tester's vsixtest repository | the client's auto repository |
+| Config | `purpose: "app"`, several `workspaces[]`, `questions[]` in the app journeys | `purpose: "client"`, one `workspace` |
 | Report folder | `reports/app/<run-id>/` in the audit repository | `reports/client/<run-id>/` |
 | Formats | [TEST_FORMAT.md](TEST_FORMAT.md), [REPORT_FORMAT.md](REPORT_FORMAT.md) | same |
 
@@ -121,8 +121,11 @@ There are two kinds of run. Do the **app tests** first, then the **client journe
    $b = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
    $img = New-Object System.Drawing.Bitmap $b.Width, $b.Height
    [System.Drawing.Graphics]::FromImage($img).CopyFromScreen($b.Location, [System.Drawing.Point]::Empty, $b.Size)
-   $img.Save("<report folder>\screens\<journey>-<nn>.png")
+   $img.Save("<report folder>\screens\<journey id>-<what>.png")
    ```
+
+   Name each file `<journey id>-<what>.png`, with lowercase letters, digits and `-` after the id,
+   for example `J01-architecture.png`.
 
 **Isolation is not total.** `--user-data-dir` and `--extensions-dir` isolate settings and
 extensions, but VS Code still opens a machine-wide store,
@@ -131,16 +134,17 @@ delete it.
 
 ## App tests (vsixtest)
 
-Goal: find what breaks in DataPass itself, and answer the open questions in the settings
-repository's `QUESTIONS.md`.
+Goal: find what breaks in DataPass itself, and answer the open questions listed in the app
+journeys' `questions[]`.
 
-1. Do the common setup with the `codex-datapass-vsixtest` settings. `qa:prepare` writes one
-   `.code-workspace` per entry of `workspaces[]`.
+1. Do the common setup with the vsixtest settings (example:
+   [examples/app/](examples/app/)). `qa:prepare` writes one `.code-workspace` per entry of
+   `workspaces[]`.
 2. Walk each app journey (`kind: "app"`) of the settings repository.
 3. Open, close and switch between the workspaces, both in the same window and in a new window.
    Watch for anything carried from one project to another: the selected variant, work orders,
    packs.
-4. For each question in `QUESTIONS.md`, write one entry in `answers[]` with:
+4. For each question in a journey's `questions[]`, write one entry in `answers[]` with:
    - the answer;
    - the evidence: a screenshot, a log line or a file;
    - your confidence.
@@ -156,7 +160,7 @@ Goal: learn whether a client reaches its goals with DataPass, and where it gets 
    - start from its `setup` (mode, variant, environment), using DataPass's own UI;
    - reach the `goal` as the client would, using `hints` only as a starting point;
    - judge each `expected` item: met, not met or unclear;
-   - take a screenshot at each meaningful step into `screens/<journey>-<nn>.png`;
+   - take a screenshot at each meaningful step into `screens/<journey id>-<what>.png`;
    - stop at the journey's minute limit: the outcome is then `partly` or `not-reached`.
 3. **Retry rule.** Before writing the finding for a `not-reached` journey, retry it once from a
    fresh window.

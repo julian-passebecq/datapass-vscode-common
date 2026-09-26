@@ -1,0 +1,56 @@
+{
+  "format": "datapass.test-journey",
+  "version": 1,
+  "id": "A01",
+  "kind": "app",
+  "title": "Open, close and switch between three projects",
+  "as": "consultant who works for several clients the same day",
+  "goal": "Work on three projects one after the other, in the same window and in new windows, without anything from one project showing up in another.",
+  "setup": {
+    "client": "doc-pipeline",
+    "mode": "DataPass"
+  },
+  "hints": [
+    "DataPass: Switch Project…",
+    "DataPass: Open a Project Repository in a New Window…"
+  ],
+  "expected": [
+    "Each project opens with its own architecture and tree",
+    "The selected variant, work orders and packs of one project never appear in another",
+    "Coming back to a project restores its own selected variant",
+    "No unhandled error in the extension host log"
+  ],
+  "questions": [
+    "V01 Clean install: are there activation errors, and how long until the first DataPass view shows?",
+    "V02 *Open a Client Project* with an https URL and with an SSH URL, including a private repository without authentication: what happens in each case?",
+    "V03 Open, close and switch 3 clients (in the same window and in a new window): does any state leak from one to another (selected variant, work orders, packs)?",
+    "V04 Is the selected variant kept after a reload, and is it kept per project?",
+    "V05 Are the status bar items still readable at a narrow window width?",
+    "V06 Do the webviews render correctly in light, dark and high-contrast themes, and in a narrow panel?",
+    "V07 Does each walkthrough step work on a fresh profile?",
+    "V08 Which DataPass palette commands fail when there is no context (no project, no file selected)?",
+    "V09 After mode switches and then a reload, is the mode and what it shows correct?",
+    "V10 AI exchange round trip with Codex as the external AI: does the export → proposal → import loop work?",
+    "V11 Hand a work order to the Codex app: does it open in the right folder, and is the receipt detected?",
+    "V12 Pilot cards with a stub request: what is shown, and is anything sent?",
+    "V13 Editing a bridge JSON file while it is open: how fast do the Problems update, and are the messages readable?",
+    "V14 File versions: keep, compare, restore. Is any data lost?",
+    "V15 Large workspace: is there any freeze longer than 1 s?",
+    "V16 Disable, then uninstall DataPass: does the project still work, and which files are left over?",
+    "V17 Git view with no remote, with a detached HEAD, and with worktrees: what does it show?",
+    "V18 Toolkit and MCP entries (DataPass 0.27 and later): are they complete and understandable?",
+    "V19 Throughout the run: any unhandled error in the extension host log?"
+  ],
+  "features": [
+    "install",
+    "onboarding",
+    "workspace",
+    "architecture",
+    "variants",
+    "work-orders",
+    "performance"
+  ],
+  "outOfScope": [
+    "signing in to any service"
+  ]
+}

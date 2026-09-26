@@ -4,23 +4,35 @@ Two kinds of test runs use the same two formats:
 
 - **App tests** (`purpose: "app"`): the tester tests the DataPass VSIX itself: installing, opening,
   closing and switching several projects, themes, reloads, error logs. It also answers DataPass's
-  open questions. These settings live in DataPass's own test repository.
+  open questions.
 - **Client journeys** (`purpose: "client"`): the tester uses DataPass as one client would, on
-  that client's project, and walks the client's journeys. These settings live in the client's
-  **auto repository**.
+  that client's project, and walks the client's journeys.
 
-Both repositories hold settings only: a config file, journey files, optional fixtures and a
-three-line `AGENTS.md`. Deleting them changes nothing in any project's code or bridge.
+The settings live in a **settings repository** written by the client's side (the client's AI or
+the tester), not by DataPass. It holds settings only: the config, journey files, optional fixtures
+and a three-line `AGENTS.md`. Deleting it changes nothing in any project's code or bridge.
 
 ```
-datapass-tests.json     the config (format datapass.codex-tests)
-journeys/*.json         journeys (format datapass.test-journey)
-fixtures/               optional: files a journey needs (for example a broken bridge copy)
-AGENTS.md               three lines: read common/testing, then create or update these settings
+datapass-codex-tests.json   the config (format datapass.codex-tests)
+journeys/*.json             journeys (format datapass.test-journey)
+fixtures/                   optional: files a journey needs (for example a broken bridge copy)
+AGENTS.md                   three lines: read common/testing, then create or update these settings
 ```
 
-> The validators in DataPass (`npm run qa:prepare`) are the reference. If this page and a
-> validator disagree, the validator wins and this page is corrected.
+DataPass also reads `datapass-auto.json` as an older name for the config. Complete, valid
+examples are in [examples/](examples/): [examples/client/](examples/client/) (the fictional
+client Codex Wind Lab, journeys J01–J10) and [examples/app/](examples/app/) (DataPass's examples
+plus Codex Wind Lab, journey A01).
+
+**Check your files** before a run, from a `datapass-vscode` clone (no VS Code and no network
+needed):
+
+```
+npm run qa:prepare -- --auto <settings repository> --check [--report <report.json>]
+```
+
+Exit code 0 means valid. Exit code 2 means invalid, and each reason is printed. That validator is
+the reference: when this page and the validator disagree, the validator wins.
 
 ## The config (`datapass.codex-tests`, version 1)
 
@@ -47,26 +59,23 @@ AGENTS.md               three lines: read common/testing, then create or update 
 
 ### App tests (`purpose: "app"`)
 
-The same fields, except that `workspaces[]` lists several projects to open, close and switch
-between. Each one gets its own `.code-workspace` file.
+These configs have no `client` and no `workspace`. Instead, `workspaces[]` lists 1 to 10 projects
+to open, close and switch between. Each one has its own `id` and `title`, and its own
+`.code-workspace` file. Several workspaces may share one clone, each with a different `path`.
 
 ```json
 {
   "format": "datapass.codex-tests", "version": 1, "purpose": "app",
-  "client": { "id": "datapass-app", "title": "DataPass app tests" },
   "datapass": { "version": "0.26.0", "vsix": "vsix/datapass-vscode-0.26.0.vsix" },
   "workspaces": [
-    { "id": "doc-pipeline", "title": "DataPass example: doc pipeline",
+    { "id": "doc-pipeline", "title": "DataPass example: Document pipeline",
       "bridge": { "remote": "https://github.com/julian-passebecq/datapass-vscode", "folder": "datapass-vscode", "path": "examples/v3/doc-pipeline" },
       "repositories": [] },
     { "id": "codex-wind-lab", "title": "Codex Wind Lab (fictional client)",
       "bridge": { "remote": "https://github.com/julian-passebecq/codex-datapass-bridge", "folder": "codex-datapass-bridge" },
-      "repositories": [
-        { "remote": "https://github.com/julian-passebecq/datapass-codex-fakeclient", "folder": "wind-study-2d" }
-      ] }
+      "repositories": [{ "remote": "https://github.com/julian-passebecq/datapass-codex-fakeclient", "folder": "wind-study-2d" }] }
   ],
   "journeys": ["journeys/A01-switch-projects.json"],
-  "questions": "QUESTIONS.md",
   "report": { "remote": "https://github.com/julian-passebecq/datapass-codex-test", "folder": "reports/app" },
   "limits": { "runMinutes": 120, "journeyMinutes": 20 }
 }
@@ -75,20 +84,22 @@ between. Each one gets its own `.code-workspace` file.
 | Field | Meaning |
 |---|---|
 | `purpose` | `app` (test the VSIX itself, several workspaces) or `client` (one client's journeys) |
-| `client` | `id` (lowercase, used in run ids) and a display `title` |
+| `client` | `client` only: `id` (lowercase, used in run ids) and a display `title` |
 | `datapass.version` | The DataPass release under test |
-| `datapass.vsix` | The VSIX file, **a local path** relative to the run root. See [CODEX_PROCEDURE.md](CODEX_PROCEDURE.md) for how to build it from the released commit |
-| `workspace` | `client` only: the `bridge` and the native `repositories[]`, each with an https `remote` and the `folder` it is cloned into |
-| `workspaces[]` | `app` only: several projects, each with an `id`, a `title`, a `bridge` and `repositories[]`. `bridge.path` is a sub-folder inside the clone (an example inside a repository) |
-| `journeys[]` | Journey files, relative to the settings repository |
-| `questions` | `app` only: the file of open questions the run answers |
-| `report` | The audit repository and its folder: `reports/app` or `reports/client` |
-| `limits` | Minutes for the whole run and for one journey |
+| `datapass.vsix` | Optional: the VSIX file, **a local path** relative to the run root, ending in `.vsix`. See [CODEX_PROCEDURE.md](CODEX_PROCEDURE.md) for how to build it from the released commit |
+| `workspace` | `client` only: the `bridge` and the native `repositories[]` |
+| `workspaces[]` | `app` only: 1–10 projects, each with `id`, `title`, `bridge` and `repositories[]` |
+| `bridge`, `repositories[]` entries | `remote` (https), `folder` (the clone under the run root) and optional `path` (a sub-folder inside that clone) |
+| `journeys[]` | 1–50 journey files, relative to the settings repository |
+| `report` | The audit repository (`remote`) and its folder: `reports/app` or `reports/client` |
+| `limits` | Optional: `runMinutes` (whole run) and `journeyMinutes` (one journey) |
 
 Rules:
 
-- Every `folder` and `path` is relative to one **run root**. `..` and absolute paths are refused.
+- Every `folder`, `path` and file name is a relative path without `..`, and no segment starts with
+  a dot. Absolute paths and drives are refused.
 - Remotes are `https://` only.
+- Objects are closed: an unknown field makes the file invalid.
 - No secret, token or personal path anywhere.
 
 ## Journeys (`datapass.test-journey`, version 1)
@@ -98,11 +109,11 @@ got there.
 
 ```json
 {
-  "format": "datapass.test-journey", "version": 1, "kind": "client",
-  "id": "J03", "title": "Prepare the dev deployment of the publish function (variant C)",
+  "format": "datapass.test-journey", "version": 1,
+  "id": "J03", "kind": "client", "title": "Prepare the dev deployment of the publish function (variant C)",
   "as": "client engineer, cloud beginner",
   "goal": "Know exactly what is needed to deploy the publish function to dev under variant C, and hand the preparation to an AI.",
-  "setup": { "mode": "Standard", "variant": "C", "environment": "dev" },
+  "setup": { "client": "codex-wind-lab", "mode": "Standard", "variant": "C", "environment": "dev" },
   "hints": ["Start from the Architecture panel", "Readiness shows what is missing"],
   "expected": [
     "The function component shows its repository, folder and the dev target",
@@ -117,17 +128,18 @@ got there.
 
 | Field | Meaning |
 |---|---|
-| `kind` | `client` (a client's goal on its project) or `app` (a check of DataPass itself across projects) |
-| `id` | `J` + digits for client journeys, `A` + digits for app journeys; unique in the repository (`V` + digits is kept for the open questions of app tests) |
+| `id` | Capital letter + letters, digits or `-` (2–20 characters). By convention `J01…` for client journeys and `A01…` for app journeys |
+| `kind` | `client` or `app`; it must equal the config's `purpose` |
 | `title` | One line |
 | `as` | Who is using DataPass in this journey (role, experience) |
 | `goal` | What they want to achieve, in their own words |
-| `setup` | Optional: DataPass `mode` (Vanilla, Standard, DataPass, Advanced), `variant`, `environment` to start from |
+| `setup` | Optional: `client` (a client or workspace `id` of the config), `mode` (Vanilla, Standard, DataPass, Advanced), `variant` and `environment` to start from |
 | `hints` | Optional: where a person would start; never a list of commands |
-| `expected` | What should be visible when the goal is reached; each item is judged met / not met / unclear |
-| `features` | Tags from [FEATURES.md](FEATURES.md) |
+| `expected` | 1–20 things visible when the goal is reached; each one is judged met / not met / unclear |
+| `questions` | Optional, mostly for app journeys: open questions this journey must answer (one `answers[]` entry each in the report) |
+| `features` | 1–20 tags from [FEATURES.md](FEATURES.md) |
 | `outOfScope` | What the tester must not do in this journey |
 
 A journey is data. DataPass never executes anything from it; the tester follows it in the UI.
 
-Examples: [JOURNEYS.md](JOURNEYS.md).
+More examples: [JOURNEYS.md](JOURNEYS.md).

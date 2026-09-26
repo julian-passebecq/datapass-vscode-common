@@ -1,12 +1,13 @@
 {
   "format": "datapass.test-journey",
   "version": 1,
-  "kind": "client",
   "id": "J02",
+  "kind": "client",
   "title": "Compare variants A, B and C",
   "as": "project lead",
   "goal": "Compare variants A, B and C, including the monthly cost, and understand which cost line is only for learning.",
   "setup": {
+    "client": "codex-wind-lab",
     "mode": "Standard"
   },
   "hints": [

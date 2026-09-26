@@ -1,12 +1,13 @@
 {
   "format": "datapass.test-journey",
   "version": 1,
-  "kind": "client",
   "id": "J06",
+  "kind": "client",
   "title": "Find which repositories have changes, open PRs or failing CI",
   "as": "project lead",
   "goal": "See at a glance which of my repositories have local changes, open pull requests or failing CI.",
   "setup": {
+    "client": "codex-wind-lab",
     "mode": "Standard"
   },
   "hints": [

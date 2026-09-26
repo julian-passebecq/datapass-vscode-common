@@ -1,12 +1,13 @@
 {
   "format": "datapass.test-journey",
   "version": 1,
-  "kind": "client",
   "id": "J07",
+  "kind": "client",
   "title": "Check that my bridge files are correct",
   "as": "client AI or engineer who wrote the bridge",
   "goal": "See whether the bridge's .datapass files are correct, and understand each error well enough to fix it.",
   "setup": {
+    "client": "codex-wind-lab",
     "mode": "Standard"
   },
   "hints": [
