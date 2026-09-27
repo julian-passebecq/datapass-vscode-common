@@ -28,6 +28,27 @@ npx tsx scripts/qa/prepare.ts --auto <auto repository clone> --root <run root> -
   approves Computer Use for `Code.exe` and the launch commands. Codex then skips steps 1–4 of the
   common setup (already done) and starts at step 5 for each journey.
 
+## Two paths in every run (from 1.0.0-rc.2)
+
+1. **The gate: `qa:ui`** (Playwright on the isolated VSIX). `qa:prepare` compiles each journey into
+   `<run root>/ui-journeys/` (format `datapass.ui-journey`). The steps come from the journey's own
+   `ui` list ([TEST_FORMAT.md](TEST_FORMAT.md)) or from DataPass's proposal for that client
+   (`qa/ui/<client id>.json` in datapass-vscode); they are never guessed from the goal's prose.
+   From the DataPass checkout that prepared the run, one command drives them all:
+   `npm run qa:ui -- "<run root>" "<run root>/ui-journeys"`. It decides reached / not-reached for
+   the release and writes `<run root>/qa-ui/<run id>/report.json`. A journey it cannot drive (no
+   steps, a step outside the vocabulary, no check, or a journey that says `notAutomatable`) is
+   listed as **not automatable**: it is `blocked` with the reason in that report, never a pass.
+2. **The exploratory pass: Codex Computer Use** (mandatory, not the gate). Codex uses DataPass as
+   the person each journey names: it clicks everywhere in the DataPass views (never a cloud sign-in
+   or deploy), chains realistic actions (open, switch, select, go back), judges the not-automatable
+   journeys, and fills the report's **UX opinion**: each thing a user would find impractical,
+   confusing or slow, with its journey and a screenshot.
+3. **If Computer Use sees no apps**, it is a Computer Use or session failure, not a DataPass one:
+   do not abort, skip the exploratory pass, rely on the `qa:ui` report, and say so. The report's
+   `runPaths` states which paths ran (`qaUi`: ran / failed / not-run; `computerUse`: ran / no-apps /
+   not-run).
+
 | | App tests (vsixtest) | Client journeys (auto) |
 |---|---|---|
 | What is tested | the DataPass VSIX itself, across several projects | DataPass as one client uses it on its project |

@@ -139,6 +139,8 @@ got there.
 | `questions` | Optional, mostly for app journeys: open questions this journey must answer (one `answers[]` entry each in the report) |
 | `features` | 1–20 tags from [FEATURES.md](FEATURES.md) |
 | `outOfScope` | What the tester must not do in this journey |
+| `ui` | Optional (from 1.0.0-rc.2): 1–40 UI steps that let `qa:ui` drive the journey (the gate). The vocabulary is `datapass.ui-journey`'s: `run` (a Command Palette label), `openView`, `press`, `click`, `type`, `quickPick`, `wait`, `commandPaletteSearch`, `settingsSearch`, `openFile` (a workspace-relative path), `chooseFolder` (`scratch` or `fixture`: the next native folder dialog), `screenshot`, and the checks `expect` / `expectAbsent`. At least one check is required. `setup.mode` becomes two leading steps; `chooseFolder scratch` needs `setup.open: "empty"`, `fixture` needs `"fixture"` |
+| `notAutomatable` | Optional, exclusive with `ui`: why the journey cannot be driven by `qa:ui` (a clipboard, a native terminal, a write to the client's repository). It is then judged by the Codex pass only |
 
 A journey is data. DataPass never executes anything from it; the tester follows it in the UI.
 
@@ -146,5 +148,19 @@ A journey is data. DataPass never executes anything from it; the tester follows 
 `setup.trust` and `setup.open`. DataPass's own release journeys (`R01…`, `kind: "app"`, in
 datapass-vscode's `qa/rc/journeys/`) are added to a client run with `--rc`; their `source` in `run.json` is
 `vendor`, the client's are `client`.
+
+Example `ui` for the journey above (DataPass's own proposals for a client live in datapass-vscode's
+`qa/ui/<client id>.json`, format `datapass.ui-steps`; a journey's own `ui` wins over them):
+
+```json
+"ui": [
+  { "run": "DataPass Architecture: Focus on Architecture View" }, { "expect": "Whole project" },
+  { "run": "DataPass: Switch the Selected Variant" }, { "quickPick": "C - " }, { "expect": "Variant: C" },
+  { "expectAbsent": "wants to sign in" }
+]
+```
+
+A journey without `ui` (and without a proposal for it) is reported as **not automatable** by
+`qa:ui`, never as a pass.
 
 More examples: [JOURNEYS.md](JOURNEYS.md).

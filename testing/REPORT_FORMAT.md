@@ -64,6 +64,8 @@ Check a report with
 | `answers[]` | One per question of the journeys' `questions[]`: `question`, `answer`, `evidence` (a log line, a file, a description), optional `screens`, `confidence` = `high` · `medium` · `low`. Empty when no journey asks a question |
 | `clientFeedback[]` | Client journeys: the doc gaps the client's AI wrote in the bridge's `QUESTIONS.md` |
 | `coverage` | Feature tags listed by the journeys, and those actually reached |
+| `runPaths` | Optional (from 1.0.0-rc.2): which paths ran. `qaUi` = `ran` · `failed` · `not-run` (the Playwright gate); `computerUse` = `ran` · `no-apps` (Computer Use saw no window: an infrastructure failure) · `not-run`; optional `note` |
+| `uxOpinion[]` | Optional (from 1.0.0-rc.2), at most 50: what a real user would find hard, from the exploratory pass. `id` (`U` + digits, unique), `kind` = `impractical` · `confusing` · `slow`, `journey` (one of the report's journeys), `title`, `detail`, `screens` (1–10), optional `suggestion` |
 
 Findings and answers are **claims** by the tester. DataPass's team verifies each one before acting
 on it.
@@ -76,4 +78,5 @@ One page:
 - a table of journeys (id, outcome, minutes);
 - the blocker and major findings, each with its first screen;
 - the answers (app tests);
-- the coverage line.
+- the coverage line;
+- which paths ran (`qa:ui`, Computer Use, or "Computer Use saw no apps") and the UX opinions.
