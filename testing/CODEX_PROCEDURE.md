@@ -52,10 +52,11 @@ There are two kinds of run. Do the **app tests** first, then the **client journe
 2. **Clone** the settings repository, and every repository its config lists into the `folder`
    each one names. Also clone `https://github.com/julian-passebecq/datapass-vscode` into
    `datapass-vscode`: the preparation helper (and, if needed, the VSIX) come from it.
-3. **Get the VSIX** named by `datapass.vsix` (a local path under the run root). There is no
-   download and no GitHub release. If the file is not there, build it locally from the
-   **released commit** of `datapass.version`. The repository has no tags, so each release's commit
-   is listed below.
+3. **Get the VSIX** named by `datapass.vsix` (a local path under the run root). From **1.0.0-rc.1**
+   on, the release is also a GitHub prerelease with the VSIX attached and its sha256 in the notes —
+   download it instead of building, and verify the hash before installing. Releases before
+   1.0.0-rc.1 have no tag and no download; build them locally from the **released commit** of
+   `datapass.version` (each one listed below).
 
    Build it in a separate clone, `dp-release`: the `datapass-vscode` clone stays on `main`, where
    the preparation helper lives.
@@ -73,12 +74,13 @@ There are two kinds of run. Do the **app tests** first, then the **client journe
 
    `npm run build` is needed: without it `vsce` stops with "Extension entrypoint(s) missing".
 
-   | DataPass version | Released commit |
-   |---|---|
-   | 0.26.0 | `c78f01f` |
+   | DataPass version | Released commit | Download | VSIX SHA-256 |
+   |---|---|---|---|
+   | 0.26.0 | `c78f01f` | — (build locally) | — |
+   | 1.0.0-rc.1 | `5a4f8d9cb1e160e68893dc546ae7aa3eb3db26d1` | [GitHub prerelease v1.0.0-rc.1](https://github.com/julian-passebecq/datapass-vscode/releases/tag/v1.0.0-rc.1) | `8850b1274c369fb11f1d2c5e776afda30a13a6fd33d0178099023e941d0ac5bd` |
 
-   For a later release, DataPass's team adds its commit to this table. `qa:prepare` records the
-   VSIX's sha256.
+   For a later release, DataPass's team adds its commit, download and hash to this table.
+   `qa:prepare` records the VSIX's sha256 it installs; it must match the table's.
 
 4. **Prepare the run.** The helper does the following:
    - validates the settings;

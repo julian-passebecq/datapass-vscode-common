@@ -23,9 +23,10 @@ The step-by-step guide: https://github.com/julian-passebecq/datapass-vscode/tree
 
 ## Rules
 
-1. Deliver a branch or a pull request; a person reviews and merges it. One pull request per
-   repository. When native files move, update `.datapass/graph.json` in a separate pull request
-   here and link the two.
+1. Deliver a branch or a pull request. `project.json`'s `project.type` decides who merges it: `dev`
+   (the template's own value) — the owning AI merges once relevant tests/CI pass; `work` — a person
+   reviews and merges. Either way, one pull request per repository; when native files move, update
+   `.datapass/graph.json` in a separate pull request here and link the two.
 2. No secret anywhere: no key, token, password, connection string or SAS URL, in files, JSON or commit
    messages. Name where it belongs (Key Vault, app settings, a git-ignored local file). The ID map
    (`identifiers`) holds only ids a person may see; secrets are listed by **name** in
