@@ -79,3 +79,4 @@ to make readiness look further along.
    [docs/guide/](https://github.com/julian-passebecq/datapass-vscode/tree/main/docs/guide), and the
    [ready-to-paste prompt](https://github.com/julian-passebecq/datapass-vscode/blob/main/docs/guide/06_PROMPT_FOR_THE_CLIENT_AI.md).
 5. [knowledge/](knowledge/README.md) for tools and MCP servers, [testing/](testing/README.md) for tests.
+6. [NATIVE_CONTRACTS_AND_CI.md](NATIVE_CONTRACTS_AND_CI.md): native contracts, native CLIs and metadata-only CI.
