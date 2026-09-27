@@ -118,6 +118,7 @@ npx tsx scripts/qa/prepare.ts --auto <auto repository clone> --root <run root> -
    | 0.26.0 | `c78f01f` | — (build locally) | — |
    | 1.0.0-rc.1 | `5a4f8d9cb1e160e68893dc546ae7aa3eb3db26d1` | [GitHub prerelease v1.0.0-rc.1](https://github.com/julian-passebecq/datapass-vscode/releases/tag/v1.0.0-rc.1) | `8850b1274c369fb11f1d2c5e776afda30a13a6fd33d0178099023e941d0ac5bd` |
    | 1.0.0-rc.2 | `651957ffba2d4c3ee94f4148c4594c48e0a30cd1` | [GitHub prerelease v1.0.0-rc.2](https://github.com/julian-passebecq/datapass-vscode/releases/tag/v1.0.0-rc.2) | `d06e09d28957eb7ac29e13e199b6b485e3632b4e76807069d0dafb570b57c7a9` |
+   | 1.0.0-rc.3 | `83e892635295ad6af667f91a5344a917968daf3b` | [GitHub prerelease v1.0.0-rc.3](https://github.com/julian-passebecq/datapass-vscode/releases/tag/v1.0.0-rc.3) | `792581d6ea7aa792f7c1e335f337228051b421ddc6ab18ece9959215df1afcd0` |
 
    For a later release, DataPass's team adds its commit, download and hash to this table.
    `qa:prepare` records the VSIX's sha256 it installs; it must match the table's.
