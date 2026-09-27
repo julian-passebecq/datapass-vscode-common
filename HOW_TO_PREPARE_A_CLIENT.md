@@ -49,7 +49,27 @@ When you lack information, DataPass improves this documentation and the hand-off
 your work. A DataPass draft of a client file is a **proposal** you adopt, change or replace; it is
 yours once delivered.
 
-## 5. What to read
+## 5. Simulators versus provider profiles
+
+A local pilot may stand in for a cloud step with an ADF-like pipeline JSON, a Functions-style
+handler runnable without the `func` CLI, or a Fabric-item folder — as long as each one is declared
+**truthfully**:
+
+- Give the simulating component a **generic, `python` or `docs` profile** (never `adf`,
+  `functions` or `fabric`, which claim a deployable native package); a real provider profile
+  belongs only to a component whose files that provider's own tooling could actually deploy.
+- Mark the cloud target it stands in for with `status: "planned"` in `graph.json`. DataPass's
+  readiness reads a `planned` or simulated component as **planned/simulated**, never
+  **deployable** — it never claims a step is ready to run in the cloud because a same-shaped local
+  file exists.
+- Say so once in `docs/ARCHITECTURE.md` or the component's `description`: which files are the
+  cloud-native shape (kept for realism or a future migration) and which script actually runs them
+  locally.
+
+This is the correct pattern for an early-stage pilot; do not "upgrade" a simulator's profile just
+to make readiness look further along.
+
+## 6. What to read
 
 1. [README](README.md): current version and rules.
 2. [`templates/bridge/`](templates/bridge/) and its [`EXPECTATIONS.md`](templates/bridge/EXPECTATIONS.md).
