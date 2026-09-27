@@ -133,7 +133,7 @@ got there.
 | `title` | One line |
 | `as` | Who is using DataPass in this journey (role, experience) |
 | `goal` | What they want to achieve, in their own words |
-| `setup` | Optional: `client` (a client or workspace `id` of the config), `mode` (Vanilla, Standard, DataPass, Advanced), `variant` and `environment` to start from |
+| `setup` | Optional: `client` (a client or workspace `id` of the config), `mode` (Vanilla, Standard, DataPass, Advanced), `variant` and `environment` to start from; how VS Code is launched: `trust` (`trusted`, the default, or `restricted`: no `--disable-workspace-trust`) and `open` (`workspace`, the default: the client's `.code-workspace`; `fixture`: a fresh copy of the public example named by `fixture`, a folder of datapass-vscode's `examples/v3/`; `empty`: an empty window with a scratch folder) |
 | `hints` | Optional: where a person would start; never a list of commands |
 | `expected` | 1–20 things visible when the goal is reached; each one is judged met / not met / unclear |
 | `questions` | Optional, mostly for app journeys: open questions this journey must answer (one `answers[]` entry each in the report) |
@@ -141,5 +141,10 @@ got there.
 | `outOfScope` | What the tester must not do in this journey |
 
 A journey is data. DataPass never executes anything from it; the tester follows it in the UI.
+
+`qa:prepare` writes one launch command per journey (in `run.json`, `journeys[].launch`), from its
+`setup.trust` and `setup.open`. DataPass's own release journeys (`R01…`, `kind: "app"`, in
+datapass-vscode's `qa/rc/journeys/`) are added to a client run with `--rc`; their `source` in `run.json` is
+`vendor`, the client's are `client`.
 
 More examples: [JOURNEYS.md](JOURNEYS.md).

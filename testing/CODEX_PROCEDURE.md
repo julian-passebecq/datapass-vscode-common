@@ -10,6 +10,24 @@
 
 There are two kinds of run. Do the **app tests** first, then the **client journeys**.
 
+**One prompt for a whole run (from 1.0.0-rc.1).** An AI session on DataPass's side prepares the run
+root, then the person pastes one file into a Codex desktop thread:
+
+```
+npx tsx scripts/qa/prepare.ts --auto <auto repository clone> --root <run root> --vsix <file> \
+  --sha256 <pinned hash> --datapass-version <version> --commit <released commit> --rc --clone
+```
+
+- `--clone` clones the declared folders that are missing; `--sha256` refuses any other VSIX;
+  `--datapass-version` tests a newer DataPass with journeys written for an older one.
+- `--rc` adds DataPass's release journeys (`qa/rc/journeys/`: installation, Restricted Mode, a
+  multi-repository project, Open a Client Project and the palette, a broken project file) to the
+  client's journeys, each with its own launch command.
+- It writes `<run root>/CODEX_PROMPT.md`: the VSIX path and SHA-256, one launch command per journey,
+  the journeys as data, where the report goes, and the rules below. The person only pastes it and
+  approves Computer Use for `Code.exe` and the launch commands. Codex then skips steps 1–4 of the
+  common setup (already done) and starts at step 5 for each journey.
+
 | | App tests (vsixtest) | Client journeys (auto) |
 |---|---|---|
 | What is tested | the DataPass VSIX itself, across several projects | DataPass as one client uses it on its project |
