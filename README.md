@@ -24,6 +24,7 @@ field states it; DataPass ≥ that version is needed to read it.
 | Step-by-step guide | https://github.com/julian-passebecq/datapass-vscode/tree/main/docs/guide |
 | Ready-to-paste prompt for a client's AI | https://github.com/julian-passebecq/datapass-vscode/blob/main/docs/guide/06_PROMPT_FOR_THE_CLIENT_AI.md |
 | Testing procedure and journeys | [`testing/`](testing/README.md) |
+| Native contracts, native CLIs, metadata-only CI | [`NATIVE_CONTRACTS_AND_CI.md`](NATIVE_CONTRACTS_AND_CI.md) |
 
 `schemas/`, `examples/`, `knowledge/toolkit/` and `VERSION` are copied from the extension
 repository by `npm run sync:common`; do not edit them here.
