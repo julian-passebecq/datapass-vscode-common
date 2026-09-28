@@ -1174,6 +1174,7 @@ Core stack:
 - Parquet;
 - optional DuckLake;
 - dlt for ingestion;
+- **Dagster OSS as the reference global orchestrator / visible project DAG;**
 - dbt + dbt-duckdb for SQL modeling;
 - Polars;
 - Pandas;
@@ -1189,9 +1190,11 @@ Explicitly excluded from Factory V1:
 - **fake Spark;**
 - **Spark simulation;**
 - real Spark runtime by default;
-- Airflow as the main orchestrator;
+- Airflow as the Factory V1 orchestrator;
+- Meltano as a core Factory dependency;
 - Kubernetes;
 - Kafka;
+- MinIO/local S3 emulation by default;
 - a mandatory Docker dependency for simple projects.
 
 The existing Mosaic SparkLab stays in Mosaic as a learning feature. Do not port it into Factory.
@@ -1358,9 +1361,10 @@ In-process/local libraries:
 
 Service components:
 
-- FastAPI;
-- Redis;
-- future Postgres/MinIO/Grafana/MLflow if needed.
+- FastAPI when an API/service boundary is part of the prototype;
+- Redis when queue/cache/stream/state semantics are actually required.
+
+Do not add Postgres, MinIO, Grafana, MLflow or another service by default. Add a component only when the scenario needs the capability and DuckDB/DuckLake/local files cannot provide the simpler path.
 
 Docker Compose is an appropriate optional service boundary.
 
@@ -1385,68 +1389,78 @@ Kubernetes can be a later specialized profile if a prototype explicitly needs co
 
 ---
 
-# 30. Factory orchestration: build a tiny typed DAG runner first
+# 30. Factory orchestration: semantic DAG + Dagster reference runtime
 
-dlt is an ingestion framework, not the universal Factory orchestrator.
+This decision changed during the design discussion and is now explicit.
 
-Factory V1 should use a deliberately small typed DAG contract.
+Factory needs a **global DAG above dbt**.
 
-Possible node types:
+The hierarchy is:
 
-- generator;
-- dlt;
-- sql;
-- dbt;
-- python;
-- polars;
-- pandas;
-- sklearn;
-- quality;
-- service;
-- docker-compose;
-- chart/publish.
-
-Illustrative project file:
-
-~~~yaml
-steps:
-  - id: generate
-    uses: generator
-    scenario: wind
-
-  - id: ingest
-    uses: dlt
-    depends_on: [generate]
-
-  - id: silver
-    uses: dbt
-    selector: silver+
-    depends_on: [ingest]
-
-  - id: features
-    uses: polars
-    file: ml/features.py
-    depends_on: [silver]
-
-  - id: model
-    uses: sklearn
-    file: ml/anomaly.py
-    depends_on: [features]
+~~~text
+Factory semantic DAG
+  generator
+      ↓
+  dlt ingestion
+      ↓
+  dbt transformation group
+      ├─ staging
+      ├─ intermediate
+      └─ marts/tests
+      ↓
+  Polars/Pandas feature work
+      ↓
+  sklearn train/score
+      ↓
+  publish/demo
 ~~~
 
-The runner needs:
+The global DAG is provider-neutral and belongs to Factory/Common Engine semantics.
 
-- dependency ordering;
-- explicit inputs/outputs;
-- run state;
-- durations;
-- logs;
-- failure propagation;
-- cancellation;
-- observed local metrics;
-- no arbitrary shell injection from untrusted project metadata.
+**Dagster OSS is the Factory V1 reference execution/orchestration adapter.**
 
-Airflow/Dagster can become future adapters if there is a real need. Do not block V1 on them.
+Why:
+
+- local/open-source;
+- clear asset/job graph;
+- good fit for data assets;
+- can orchestrate Python work;
+- can sit above dbt instead of replacing dbt;
+- dlt has a Dagster integration path;
+- no Kubernetes requirement;
+- local UI is available for deeper operations.
+
+Factory should still render its own DAG in the Workbench so the product is not dependent on embedding Dagster's UI.
+
+The dbt DAG is nested, not flattened away:
+
+~~~text
+global Factory DAG
+  -> dbt group
+       -> dbt internal model DAG
+~~~
+
+Clicking the dbt group should expose models/tests/sources from dbt artifacts.
+
+dlt remains ingestion, not the project orchestrator.
+
+Airflow remains useful for real client projects and can later be analyzed/imported/routed, but is intentionally not the Factory V1 runtime because the setup/operational surface is larger than needed.
+
+Meltano is not core V1 because it overlaps with dlt/dbt and its documented orchestration path introduces another abstraction and commonly Airflow; keep it as a cataloged alternative/importer for projects that already use it.
+
+Do not build a second production scheduler. Factory owns:
+
+- strict DAG schema;
+- stable IDs;
+- dependency validation;
+- nested groups;
+- source/evidence mapping;
+- normalized run receipts;
+- UI visualization.
+
+Dagster owns execution/runtime orchestration.
+
+Full rationale: [V4_ORCHESTRATION_DECISION.md](V4_ORCHESTRATION_DECISION.md).
 
 ---
 
