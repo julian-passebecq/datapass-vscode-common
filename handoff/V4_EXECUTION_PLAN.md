@@ -716,36 +716,45 @@ First milestone:
 
 ---
 
-# 18. Phase 14 — Factory semantic DAG + Dagster adapter
+# 18. Phase 14 — Factory semantic DAG + local orchestrator
 
-Implement strict `factory.yml` as a provider-neutral semantic DAG.
+Implement strict `factory.yml` as a provider-neutral semantic DAG above dbt.
 
-The graph must sit above dbt and remain serializable independently of Dagster.
+Before writing a new scheduler, extract/reuse the proven control-flow concepts from Mosaic:
 
-Initial global node kinds:
+- `runtime/factorylab/engine.py`;
+- `runtime/datapass_runtime/factory_workspace.py`;
+- `SharedGraphCanvas`;
+- `FactoryPipelines.tsx`;
+- `PipelineSurface.tsx`.
+
+Replace simulation-only work execution with real local adapters.
+
+Initial node kinds:
 
 - generator;
-- sql;
+- sql / DuckDB;
 - python;
 - polars;
 - pandas;
 - quality;
 - dbt;
 - dlt;
-- sklearn.
+- sklearn;
+- export.
 
-No service nodes yet.
+Required V1 scheduler behavior:
 
-Implement Dagster OSS as the first orchestration/runtime adapter.
-
-Required behavior:
-
-- compile/map the supported Factory DAG into Dagster definitions/assets/jobs;
-- execute dependencies through Dagster;
-- normalize run events into Factory/Common run receipts;
-- keep stable Factory semantic IDs;
-- keep Factory graph UI independent of Dagster UI;
-- provide optional **Open in Dagster** for deeper operational inspection.
+- graph/cycle validation;
+- dependency ordering;
+- parallel independent ready nodes;
+- success/failure/always conditions;
+- retries;
+- timeout;
+- cancellation;
+- subprocess isolation;
+- local logs/events;
+- deterministic normalized run receipts.
 
 dbt is a nested subgraph:
 
@@ -755,21 +764,24 @@ Factory DAG
        -> dbt internal DAG
 ~~~
 
-Do not build a parallel production scheduler.
+Do **not** require Dagster, Airflow, Meltano, Kubernetes or Docker for this phase.
 
-Do not add Airflow or Meltano to Factory V1 core.
+Dagster can remain a later optional adapter if a concrete post-V1 requirement justifies it.
 
 ## Tests
 
-- DAG cycles;
+- cycles;
 - unknown node/adapter;
 - missing dependency;
-- nested group integrity;
-- Dagster mapping;
-- failure propagation;
+- independent-node parallelism;
+- success/failure edges;
+- retry;
+- timeout;
 - cancellation;
-- deterministic normalized run receipt;
-- Factory IDs preserved across compile/run.
+- subprocess failure isolation;
+- nested dbt group integrity;
+- deterministic receipts;
+- observed/local truth labels.
 
 Full rationale: `handoff/V4_ORCHESTRATION_DECISION.md`.
 
@@ -844,7 +856,7 @@ Capture:
 - tests;
 - model lineage.
 
-Expose dbt as a nested subgraph of the global Factory/Dagster DAG. Clicking the dbt group should expose sources/models/tests and link back to native SQL files.
+Expose dbt as a nested subgraph of the global Factory DAG. Clicking the dbt group should expose sources/models/tests and link back to native SQL files.
 
 Do not use Mosaic teaching emulation for Factory.
 
@@ -881,7 +893,7 @@ Add dlt adapter.
 
 Use for quick ingestion.
 
-Integrate dlt as an ingestion asset/group under the global Dagster DAG; do not treat dlt as the whole orchestrator.
+Integrate dlt as an ingestion activity/group under the global Factory DAG; do not treat dlt as the whole orchestrator.
 
 Record:
 
