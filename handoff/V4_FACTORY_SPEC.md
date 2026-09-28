@@ -90,14 +90,14 @@ No required:
 
 Docker Compose is sufficient for optional local services.
 
-## Dagster is the reference orchestrator; Airflow is not V1 core
+## Factory Local Orchestrator is the reference runtime; Airflow/Dagster are not V1 core
 
-Factory owns a small provider-neutral **semantic DAG contract**, but **Dagster OSS is the reference orchestration/runtime adapter for V1**.
+Factory owns a small provider-neutral **semantic DAG contract** and executes it through a **bounded local orchestrator** extracted from the existing Mosaic/Factory Lab control-flow engine. Dagster is optional later, not required in V1.
 
 The global Factory DAG sits above dbt:
 
 ~~~text
-Factory / Dagster DAG
+Factory global DAG
   generator -> dlt -> dbt -> Polars -> sklearn -> publish
                          |
                          +-- dbt internal model DAG
@@ -151,9 +151,9 @@ Do not add MinIO/S3 emulation merely to make the prototype look cloud-like. Add 
 
 ## Global orchestration / visible DAG
 
-- Dagster OSS as the V1 reference orchestration adapter;
+- Factory Local Orchestrator as the V1 execution layer;
 - Factory semantic DAG remains provider-neutral and serializable;
-- Dagster UI is optional deep operational tooling, not the only DAG view.
+- no third-party orchestration UI or daemon is required.
 
 ## SQL transformation
 
@@ -201,7 +201,7 @@ Preferred order:
 5. dbt-duckdb.
 6. dlt.
 7. scikit-learn.
-8. Dagster for the global DAG.
+8. Factory Local Orchestrator for the global DAG.
 9. FastAPI only for a real API/service boundary.
 10. Redis only for a real cache/queue/stream/state boundary.
 11. Docker Compose only when service processes require it.
@@ -498,7 +498,7 @@ Exact paths may evolve. The principle is native source first and generated state
 
 Factory owns a typed local **semantic project graph**. This is the portable source used by the Factory UI, Common Semantic Engine and Prototype Cloud handoff.
 
-Dagster is the first execution/orchestration adapter for this graph; Dagster Python definitions are not the provider-neutral source of truth.
+The Factory Local Orchestrator executes this graph directly. A future Dagster adapter may consume the same graph, but Dagster definitions are not required in V1.
 
 The graph is explicitly above dbt. A dbt node/group can expose its own internal model DAG from dbt artifacts.
 
@@ -598,43 +598,46 @@ No spark-sim adapter.
 
 ---
 
-# 13. Dagster orchestration adapter responsibilities
+# 13. Factory Local Orchestrator responsibilities
 
-Do not build a second scheduler if Dagster already provides the runtime semantics Factory needs.
+Reuse the existing Mosaic / Factory Lab control-flow work instead of building orchestration from zero.
+
+Existing donors include:
+
+- `runtime/factorylab/engine.py`;
+- `runtime/datapass_runtime/factory_workspace.py`;
+- `SharedGraphCanvas`;
+- `FactoryPipelines.tsx`;
+- `PipelineSurface.tsx`.
+
+The V1 production runtime should extract the useful dependency/control-flow semantics and replace simulation-only work activities with real local adapters.
 
 Factory owns:
 
-- strict DAG schema;
-- stable semantic IDs;
-- dependency validation;
-- cycle refusal before execution;
-- nested groups/subgraphs;
+- strict DAG schema and stable semantic IDs;
+- cycle validation;
+- ready-node scheduling;
+- bounded local concurrency;
+- success/failure/always dependency conditions;
+- retries and timeout;
+- cancellation;
+- subprocess lifecycle;
 - source/evidence references;
-- mapping to Common Semantic IR;
-- normalized run receipts;
+- normalized local run receipts;
 - its own DAG visualization.
 
-Dagster owns:
+Implementation should use a small Python scheduler (for example `asyncio`) and subprocess isolation for project code/external tools.
 
-- dependency execution;
-- local run state;
-- schedules when a scenario actually needs them;
-- retries when explicitly configured;
-- resource lifecycle;
-- operational logs/events.
+Do not build:
 
-Factory must normalize Dagster events into its own receipts so the Common Engine does not depend on Dagster types.
+- distributed workers;
+- a backfill platform;
+- Kubernetes executors;
+- HA scheduler;
+- remote agents;
+- multi-tenant server.
 
-The Factory UI must remain useful without opening Dagster's own UI. Provide an optional **Open in Dagster** route for deeper local operational inspection.
-
-Do not implement:
-
-- Airflow scheduler semantics;
-- Kubernetes operators;
-- a distributed executor abstraction;
-- a second home-grown production scheduler.
-
----
+Dagster may be added later as an optional adapter only if a real requirement appears that exceeds this bounded local kernel.
 
 # 14. Run truth model
 
@@ -984,7 +987,7 @@ dbt Charts optional:
 
 ## dbt as a nested DAG
 
-The global Factory/Dagster graph must sit **above** dbt.
+The global Factory graph must sit **above** dbt.
 
 At global level:
 
@@ -1000,7 +1003,7 @@ sources -> staging -> intermediate -> marts -> tests
 
 Clicking a dbt group should expand to models; clicking a model should open its SQL and semantic understanding.
 
-Dagster's dbt integration may execute/materialize the dbt assets, but Factory/Common IR keeps provider-neutral IDs and evidence.
+The Factory dbt adapter invokes dbt Core and ingests dbt artifacts, while Factory/Common IR keeps provider-neutral IDs and evidence.
 
 ---
 
