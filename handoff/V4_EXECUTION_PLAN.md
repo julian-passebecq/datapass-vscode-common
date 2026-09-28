@@ -716,35 +716,62 @@ First milestone:
 
 ---
 
-# 18. Phase 14 — Factory DAG
+# 18. Phase 14 — Factory semantic DAG + Dagster adapter
 
-Implement strict factory.yml.
+Implement strict `factory.yml` as a provider-neutral semantic DAG.
 
-V1 nodes:
+The graph must sit above dbt and remain serializable independently of Dagster.
+
+Initial global node kinds:
 
 - generator;
 - sql;
 - python;
 - polars;
 - pandas;
-- quality.
-
-Later in same phase:
-
+- quality;
 - dbt;
 - dlt;
 - sklearn.
 
 No service nodes yet.
 
+Implement Dagster OSS as the first orchestration/runtime adapter.
+
+Required behavior:
+
+- compile/map the supported Factory DAG into Dagster definitions/assets/jobs;
+- execute dependencies through Dagster;
+- normalize run events into Factory/Common run receipts;
+- keep stable Factory semantic IDs;
+- keep Factory graph UI independent of Dagster UI;
+- provide optional **Open in Dagster** for deeper operational inspection.
+
+dbt is a nested subgraph:
+
+~~~text
+Factory DAG
+  -> dbt group
+       -> dbt internal DAG
+~~~
+
+Do not build a parallel production scheduler.
+
+Do not add Airflow or Meltano to Factory V1 core.
+
 ## Tests
 
 - DAG cycles;
-- unknown adapter;
+- unknown node/adapter;
 - missing dependency;
+- nested group integrity;
+- Dagster mapping;
 - failure propagation;
 - cancellation;
-- deterministic run receipt.
+- deterministic normalized run receipt;
+- Factory IDs preserved across compile/run.
+
+Full rationale: `handoff/V4_ORCHESTRATION_DECISION.md`.
 
 ---
 
@@ -786,6 +813,8 @@ DuckDB default.
 
 DuckLake optional.
 
+Prefer local filesystem + Parquet + DuckLake. **Do not introduce MinIO/local S3 emulation in V1** unless a specific scenario explicitly needs object-store semantics.
+
 Generalize Contoso DuckLake patterns:
 
 - bounded data path;
@@ -814,6 +843,8 @@ Capture:
 - run_results;
 - tests;
 - model lineage.
+
+Expose dbt as a nested subgraph of the global Factory/Dagster DAG. Clicking the dbt group should expose sources/models/tests and link back to native SQL files.
 
 Do not use Mosaic teaching emulation for Factory.
 
@@ -850,6 +881,8 @@ Add dlt adapter.
 
 Use for quick ingestion.
 
+Integrate dlt as an ingestion asset/group under the global Dagster DAG; do not treat dlt as the whole orchestrator.
+
 Record:
 
 - source;
@@ -885,6 +918,8 @@ Docker Compose:
 - known project file;
 - status/logs;
 - no Kubernetes.
+
+Do not add MinIO, Postgres, Kafka, Grafana or MLflow merely to imitate cloud infrastructure. Add a service only when the demo capability genuinely requires it and a simpler DuckDB/DuckLake/local-file path cannot serve the need.
 
 ---
 
