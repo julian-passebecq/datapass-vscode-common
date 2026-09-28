@@ -716,11 +716,11 @@ First milestone:
 
 ---
 
-# 18. Phase 14 — Factory semantic DAG + local orchestrator
+# 18. Phase 14 — Factory semantic DAG + execution-foundation spikes
 
 Implement strict `factory.yml` as a provider-neutral semantic DAG above dbt.
 
-Before writing a new scheduler, extract/reuse the proven control-flow concepts from Mosaic:
+Before choosing the lower runtime, run both required spikes.
 
 - `runtime/factorylab/engine.py`;
 - `runtime/datapass_runtime/factory_workspace.py`;
@@ -729,6 +729,47 @@ Before writing a new scheduler, extract/reuse the proven control-flow concepts f
 - `PipelineSurface.tsx`.
 
 Replace simulation-only work execution with real local adapters.
+
+## Spike A — Duckle adapter-first
+
+Use the existing datapasscontrol ADR as the starting hypothesis, not as final truth.
+
+Prove:
+- Factory IR -> Duckle JSON;
+- local execution;
+- DuckLake;
+- dbt boundary;
+- previews/rows/timings/status/errors;
+- lineage/generated SQL;
+- control-flow node;
+- runner/server security and packaging.
+
+## Spike B — Mosaic / FactoryLab extraction
+
+Audit/extract:
+- runtime/factorylab/engine.py;
+- factory_workspace.py;
+- SharedGraphCanvas;
+- FactoryPipelines;
+- PipelineSurface;
+- ducklabms GraphCanvas/WorkbenchSurface and related pipeline runner/compiler.
+
+Prove:
+- real DuckDB activity;
+- dbt group;
+- dlt/Python activity;
+- retry/timeout/cancel;
+- independent-node concurrency;
+- normalized receipts.
+
+## ADR gate
+
+Codex writes `ADR-FACTORY-EXECUTION-001.md` and chooses:
+- Duckle adapter-first;
+- extracted engine;
+- hybrid.
+
+No generic executor implementation starts before the ADR.
 
 Initial node kinds:
 
@@ -764,7 +805,7 @@ Factory DAG
        -> dbt internal DAG
 ~~~
 
-Do **not** require Dagster, Airflow, Meltano, Kubernetes or Docker for this phase.
+Do **not** assume Dagster, Airflow, Meltano, Kubernetes or Docker as the core runtime for this phase. Duckle must be evaluated before greenfield execution.
 
 Dagster can remain a later optional adapter if a concrete post-V1 requirement justifies it.
 
