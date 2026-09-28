@@ -9,9 +9,10 @@ This branch is the planning and coordination entry point for the next DataPass a
 1. [handoff/V4_MASTER_HANDOFF.md](handoff/V4_MASTER_HANDOFF.md) — full decision history, product boundaries, repository map and the target galaxy.
 2. [handoff/V4_COMMON_ENGINE_SPEC.md](handoff/V4_COMMON_ENGINE_SPEC.md) — semantic IR, analyzers, catalog, provenance, lineage, findings, workload, performance/cost and AI bridge.
 3. [handoff/V4_FACTORY_SPEC.md](handoff/V4_FACTORY_SPEC.md) — the new local-first Factory product, extracted Mosaic workbench base, Contoso generator extraction and runtime stack.
-4. [handoff/V4_FABRIC_V1.md](handoff/V4_FABRIC_V1.md) — first provider vertical: Fabric patterns, feature toggles, developer trade-offs, monitoring and capacity/cost drivers.
-5. [handoff/V4_EXECUTION_PLAN.md](handoff/V4_EXECUTION_PLAN.md) — phased multi-repository implementation plan, gates and PR order.
-6. Current V3 source of truth in [julian-passebecq/datapass-vscode](https://github.com/julian-passebecq/datapass-vscode), especially its own `CLAUDE.md`, `handoff/CURRENT.md`, `handoff/PLAN.md` and `IMPLEMENTATION_STATUS.md`.
+4. [handoff/V4_ORCHESTRATION_DECISION.md](handoff/V4_ORCHESTRATION_DECISION.md) — final orchestration decision: provider-neutral Factory DAG, Dagster OSS runtime, dbt nested DAG, dlt ingestion, no Airflow/Meltano core.
+5. [handoff/V4_FABRIC_V1.md](handoff/V4_FABRIC_V1.md) — first provider vertical: Fabric patterns, feature toggles, developer trade-offs, monitoring and capacity/cost drivers.
+6. [handoff/V4_EXECUTION_PLAN.md](handoff/V4_EXECUTION_PLAN.md) — phased multi-repository implementation plan, gates and PR order.
+7. Current V3 source of truth in [julian-passebecq/datapass-vscode](https://github.com/julian-passebecq/datapass-vscode), especially its own `CLAUDE.md`, `handoff/CURRENT.md`, `handoff/PLAN.md` and `IMPLEMENTATION_STATUS.md`.
 
 ## Critical instruction
 
@@ -40,6 +41,8 @@ This repository is the common reference and proposed future home of shared, prov
 - Do not make Cloudiagram, Mosaic or Mongoku mandatory dependencies of DataPass V4.
 - **Factory V1 has no fake Spark and no Spark simulator.** Existing SparkLab remains only in the separate Mosaic learning product. Factory may support real Spark in the future through an explicit adapter, but V1 uses local engines such as DuckDB, DuckLake, Polars, Pandas and scikit-learn.
 - **Kubernetes is not a Factory V1 dependency.** Docker Compose is the service boundary for V1.
+- **Dagster OSS is the Factory V1 reference orchestrator**, above dlt/dbt/Polars/sklearn. The Factory semantic DAG remains engine-neutral; dbt is an expandable nested transformation DAG.
+- **Local minimalism is mandatory:** DuckDB/local Parquet first, DuckLake when lakehouse semantics matter; no MinIO/S3 emulator, Postgres, Kafka or extra service merely to imitate cloud infrastructure.
 
 ## Current coordination branch
 
