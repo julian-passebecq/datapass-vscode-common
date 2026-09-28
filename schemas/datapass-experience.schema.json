@@ -85,10 +85,12 @@
                 "view.agentPanel",
                 "ai.pilot",
                 "ai.codexTests",
-                "palette.full"
+                "view.airflowDag",
+                "palette.full",
+                "view.rail"
               ]
             },
-            "maxItems": 34,
+            "maxItems": 36,
             "minItems": 0
           }
         },
