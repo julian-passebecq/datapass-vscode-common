@@ -1174,7 +1174,7 @@ Core stack:
 - Parquet;
 - optional DuckLake;
 - dlt for ingestion;
-- **our bounded Factory Local Orchestrator as the global execution layer;**
+- **Factory execution foundation remains an explicit tech-lead gate: Duckle adapter-first vs extracted Mosaic/FactoryLab engine vs hybrid;**
 - dbt + dbt-duckdb for SQL modeling;
 - Polars;
 - Pandas;
@@ -1389,7 +1389,7 @@ Kubernetes can be a later specialized profile if a prototype explicitly needs co
 
 ---
 
-# 30. Factory orchestration: semantic DAG + bounded local runtime
+# 30. Factory orchestration: semantic DAG + unresolved execution foundation gate
 
 The final decision changed after inspecting the current Mosaic code.
 
@@ -1399,9 +1399,9 @@ Factory already has a strong donor in `datapass-mosaic-vscode`:
 - `runtime/factorylab/engine.py`, which already models Data Factory-style dependencies, success/failure/completed edges, retries, timeouts, inactive/skipped tasks, If/Switch/ForEach/Until, child pipelines, parameters, variables and run state;
 - a `Workspace` adapter boundary that can execute supported work activities against the local catalog.
 
-Therefore **Factory V1 should not require Dagster**.
+Therefore **Factory V1 should not require Dagster by default, but the lower execution foundation is not yet finalized**.
 
-The target is:
+The stable semantic target is:
 
 ~~~text
 Factory Semantic DAG
@@ -1416,11 +1416,11 @@ Factory Local Orchestrator
       └─ quality / export
 ~~~
 
-The orchestrator is deliberately bounded to local-only execution: dependency ordering, parallel ready nodes, success/failure edges, retry, timeout, cancellation, state, logs and normalized receipts.
+Regardless of the chosen lower layer, execution remains local-only and must expose dependency ordering, success/failure state, retry/timeout/cancel where supported, logs and normalized receipts.
 
 It is **not** a replacement for Airflow/Dagster/Kubernetes at production scale.
 
-Dagster becomes an optional future adapter if we later need its broader scheduling/assets/run ecosystem.
+Codex must first run the Duckle adapter spike and the Mosaic extraction spike described in V4_ORCHESTRATION_DECISION.md. Duckle is a previously accepted lower-layer candidate in datapasscontrol; greenfield execution work must not bypass that evidence.
 
 Fabric is the conceptual reference: Fabric Data Factory uses a pipeline/activity orchestration model over copy, notebook, SQL, Dataflow and dbt activities. Factory should mirror that mental model locally with our own typed activities.
 
