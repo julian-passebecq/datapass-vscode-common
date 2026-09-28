@@ -1174,7 +1174,7 @@ Core stack:
 - Parquet;
 - optional DuckLake;
 - dlt for ingestion;
-- **Dagster OSS as the reference global orchestrator / visible project DAG;**
+- **our bounded Factory Local Orchestrator as the global execution layer;**
 - dbt + dbt-duckdb for SQL modeling;
 - Polars;
 - Pandas;
@@ -1389,76 +1389,42 @@ Kubernetes can be a later specialized profile if a prototype explicitly needs co
 
 ---
 
-# 30. Factory orchestration: semantic DAG + Dagster reference runtime
+# 30. Factory orchestration: semantic DAG + bounded local runtime
 
-This decision changed during the design discussion and is now explicit.
+The final decision changed after inspecting the current Mosaic code.
 
-Factory needs a **global DAG above dbt**.
+Factory already has a strong donor in `datapass-mosaic-vscode`:
 
-The hierarchy is:
+- `SharedGraphCanvas`, `FactoryPipelines.tsx` and `PipelineSurface.tsx`;
+- `runtime/factorylab/engine.py`, which already models Data Factory-style dependencies, success/failure/completed edges, retries, timeouts, inactive/skipped tasks, If/Switch/ForEach/Until, child pipelines, parameters, variables and run state;
+- a `Workspace` adapter boundary that can execute supported work activities against the local catalog.
 
-~~~text
-Factory semantic DAG
-  generator
-      ↓
-  dlt ingestion
-      ↓
-  dbt transformation group
-      ├─ staging
-      ├─ intermediate
-      └─ marts/tests
-      ↓
-  Polars/Pandas feature work
-      ↓
-  sklearn train/score
-      ↓
-  publish/demo
-~~~
+Therefore **Factory V1 should not require Dagster**.
 
-The global DAG is provider-neutral and belongs to Factory/Common Engine semantics.
-
-**Dagster OSS is the Factory V1 reference execution/orchestration adapter.**
-
-Why:
-
-- local/open-source;
-- clear asset/job graph;
-- good fit for data assets;
-- can orchestrate Python work;
-- can sit above dbt instead of replacing dbt;
-- dlt has a Dagster integration path;
-- no Kubernetes requirement;
-- local UI is available for deeper operations.
-
-Factory should still render its own DAG in the Workbench so the product is not dependent on embedding Dagster's UI.
-
-The dbt DAG is nested, not flattened away:
+The target is:
 
 ~~~text
-global Factory DAG
-  -> dbt group
-       -> dbt internal model DAG
+Factory Semantic DAG
+      ↓
+Factory Local Orchestrator
+      ├─ dlt ingestion
+      ├─ dbt group
+      │    └─ nested dbt model DAG
+      ├─ DuckDB SQL
+      ├─ Polars / Pandas
+      ├─ Python / sklearn
+      └─ quality / export
 ~~~
 
-Clicking the dbt group should expose models/tests/sources from dbt artifacts.
+The orchestrator is deliberately bounded to local-only execution: dependency ordering, parallel ready nodes, success/failure edges, retry, timeout, cancellation, state, logs and normalized receipts.
 
-dlt remains ingestion, not the project orchestrator.
+It is **not** a replacement for Airflow/Dagster/Kubernetes at production scale.
 
-Airflow remains useful for real client projects and can later be analyzed/imported/routed, but is intentionally not the Factory V1 runtime because the setup/operational surface is larger than needed.
+Dagster becomes an optional future adapter if we later need its broader scheduling/assets/run ecosystem.
 
-Meltano is not core V1 because it overlaps with dlt/dbt and its documented orchestration path introduces another abstraction and commonly Airflow; keep it as a cataloged alternative/importer for projects that already use it.
+Fabric is the conceptual reference: Fabric Data Factory uses a pipeline/activity orchestration model over copy, notebook, SQL, Dataflow and dbt activities. Factory should mirror that mental model locally with our own typed activities.
 
-Do not build a second production scheduler. Factory owns:
-
-- strict DAG schema;
-- stable IDs;
-- dependency validation;
-- nested groups;
-- source/evidence mapping;
-- normalized run receipts;
-- UI visualization.
-
-Dagster owns execution/runtime orchestration.
+dlt remains ingestion. dbt remains transformation/model DAG. Neither becomes the global orchestrator.
 
 Full rationale: [V4_ORCHESTRATION_DECISION.md](V4_ORCHESTRATION_DECISION.md).
 
