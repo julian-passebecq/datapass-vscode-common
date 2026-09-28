@@ -54,4 +54,4 @@ Start from the common bridge template, [`templates/bridge/`](templates/bridge/):
 
 A new multi-repository V4 architecture is being designed on branch `plan/v4-semantic-engine-factory`. It introduces a shared semantic engine/catalog used by DataPass V4, Prototype Cloud, Hub and a new local-first Factory product.
 
-Implementation agents should start with [CLAUDE.md](CLAUDE.md) and [handoff/V4_MASTER_HANDOFF.md](handoff/V4_MASTER_HANDOFF.md). The handoff records the full decision path, technical contracts, Fabric V1 vertical and phased execution plan. Factory V1 explicitly excludes fake Spark and Kubernetes as required dependencies.
+Implementation agents should start with [CLAUDE.md](CLAUDE.md) and [handoff/V4_MASTER_HANDOFF.md](handoff/V4_MASTER_HANDOFF.md). The handoff records the full decision path, technical contracts, Fabric V1 vertical, Factory orchestration decision and phased execution plan. Factory V1 explicitly excludes fake Spark and Kubernetes as required dependencies, uses **Dagster OSS** as the reference global orchestrator above dlt/dbt, and prefers the simplest DuckDB/DuckLake/local-files solution before adding services such as Redis or Docker.
