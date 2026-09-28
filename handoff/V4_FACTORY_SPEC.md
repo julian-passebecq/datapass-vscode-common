@@ -90,9 +90,9 @@ No required:
 
 Docker Compose is sufficient for optional local services.
 
-## Factory Local Orchestrator is the reference runtime; Airflow/Dagster are not V1 core
+## Factory execution foundation is an explicit architecture gate
 
-Factory owns a small provider-neutral **semantic DAG contract** and executes it through a **bounded local orchestrator** extracted from the existing Mosaic/Factory Lab control-flow engine. Dagster is optional later, not required in V1.
+Factory owns a small provider-neutral **semantic DAG contract**. The lower execution foundation is intentionally unresolved until Codex completes the Duckle-vs-Mosaic/hybrid spike. Dagster/Airflow are not assumed core.
 
 The global Factory DAG sits above dbt:
 
@@ -151,9 +151,9 @@ Do not add MinIO/S3 emulation merely to make the prototype look cloud-like. Add 
 
 ## Global orchestration / visible DAG
 
-- Factory Local Orchestrator as the V1 execution layer;
 - Factory semantic DAG remains provider-neutral and serializable;
-- no third-party orchestration UI or daemon is required.
+- execution may be Duckle adapter-first, extracted Mosaic/FactoryLab control flow, or a measured hybrid;
+- no third-party orchestration UI should become the semantic source of truth.
 
 ## SQL transformation
 
@@ -201,7 +201,7 @@ Preferred order:
 5. dbt-duckdb.
 6. dlt.
 7. scikit-learn.
-8. Factory Local Orchestrator for the global DAG.
+8. chosen Factory execution foundation after ADR-FACTORY-EXECUTION-001.
 9. FastAPI only for a real API/service boundary.
 10. Redis only for a real cache/queue/stream/state boundary.
 11. Docker Compose only when service processes require it.
@@ -498,7 +498,7 @@ Exact paths may evolve. The principle is native source first and generated state
 
 Factory owns a typed local **semantic project graph**. This is the portable source used by the Factory UI, Common Semantic Engine and Prototype Cloud handoff.
 
-The Factory Local Orchestrator executes this graph directly. A future Dagster adapter may consume the same graph, but Dagster definitions are not required in V1.
+The chosen lower layer executes the graph through an adapter. The Common Semantic DAG remains authoritative regardless of Duckle, extracted Mosaic control flow, or another reviewed local adapter.
 
 The graph is explicitly above dbt. A dbt node/group can expose its own internal model DAG from dbt artifacts.
 
@@ -598,9 +598,9 @@ No spark-sim adapter.
 
 ---
 
-# 13. Factory Local Orchestrator responsibilities
+# 13. Factory execution foundation gate and adapter responsibilities
 
-Reuse the existing Mosaic / Factory Lab control-flow work instead of building orchestration from zero.
+Before implementing generic execution, compare the existing Mosaic / Factory Lab control-flow work with Duckle and a hybrid boundary.
 
 Existing donors include:
 
@@ -612,7 +612,7 @@ Existing donors include:
 
 The V1 production runtime should extract the useful dependency/control-flow semantics and replace simulation-only work activities with real local adapters.
 
-Factory owns:
+Factory/Common owns regardless of lower layer:
 
 - strict DAG schema and stable semantic IDs;
 - cycle validation;
@@ -626,7 +626,7 @@ Factory owns:
 - normalized local run receipts;
 - its own DAG visualization.
 
-Implementation should use a small Python scheduler (for example `asyncio`) and subprocess isolation for project code/external tools.
+If Codex selects the extracted-engine path, a small Python scheduler with subprocess isolation is appropriate. If Duckle or hybrid is selected, preserve equivalent cancellation/error/evidence semantics through the adapter.
 
 Do not build:
 
@@ -637,7 +637,7 @@ Do not build:
 - remote agents;
 - multi-tenant server.
 
-Dagster may be added later as an optional adapter only if a real requirement appears that exceeds this bounded local kernel.
+Required gate output: `ADR-FACTORY-EXECUTION-001.md`, backed by a Duckle adapter spike and a Mosaic extraction spike. Do not greenfield a general executor before this ADR.
 
 # 14. Run truth model
 
